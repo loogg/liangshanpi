@@ -9,8 +9,13 @@
  * 2022-05-10     Meco Man      improve rt-thread initialization process
  */
 #include <lvgl.h>
+#include "gui_guider.h"
+#include "custom.h"
+
+lv_ui guider_ui;
 
 void lv_user_gui_init(void)
 {
-
+    setup_ui(&guider_ui);
+    custom_init(&guider_ui);
 }

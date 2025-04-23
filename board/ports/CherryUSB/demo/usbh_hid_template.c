@@ -9,11 +9,11 @@ void usbh_hid_callback(void *arg, int nbytes)
     struct usbh_hid *hid_class = (struct usbh_hid *)arg;
 
     if (nbytes > 0) {
-        for (int i = 0; i < nbytes; i++) {
-            USB_LOG_RAW("0x%02x ", hid_buffer[i]);
-        }
-        USB_LOG_RAW("nbytes:%d\r\n", nbytes);
-        if (nbytes <= 8)
+        // for (int i = 0; i < nbytes; i++) {
+        //     USB_LOG_RAW("0x%02x ", hid_buffer[i]);
+        // }
+        // USB_LOG_RAW("nbytes:%d\r\n", nbytes);
+        if (nbytes == 8 || nbytes == 13)
             usbh_hid_mouse_decode(hid_buffer);
         usbh_int_urb_fill(&hid_class->intin_urb, hid_class->hport, hid_class->intin, hid_buffer, hid_class->intin->wMaxPacketSize, 0, usbh_hid_callback, hid_class);
         usbh_submit_urb(&hid_class->intin_urb);
