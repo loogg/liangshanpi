@@ -169,8 +169,9 @@ int usbh_hid_mouse_decode(uint8_t *data)
     mouse_info.buttons[1] = data[0] & MOUSE_BUTTON_2;
     mouse_info.buttons[2] = data[0] & MOUSE_BUTTON_3;
 
-    mouse_info.x = data[1];
-    mouse_info.y = data[2];
+    mouse_info.x = *(int16_t *)(data + 2);
+    mouse_info.y = *(int16_t *)(data + 4);
+    mouse_info.wheel = -(int8_t)data[6];
 
     /* handle mouse data position */
     usr_mouse_process_data(&mouse_info);

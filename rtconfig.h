@@ -98,6 +98,7 @@
 
 /* Memory Management */
 
+#define RT_USING_MEMPOOL
 #define RT_USING_MEMHEAP
 #define RT_MEMHEAP_FAST_MODE
 #define RT_USING_MEMHEAP_AS_HEAP
@@ -175,12 +176,22 @@
 #define RT_USING_SERIAL
 #define RT_USING_SERIAL_V1
 #define RT_SERIAL_RB_BUFSZ 64
+#define RT_USING_PWM
 #define RT_USING_SDIO
 #define RT_SDIO_STACK_SIZE 512
 #define RT_SDIO_THREAD_PRIORITY 15
 #define RT_MMCSD_STACK_SIZE 2048
 #define RT_MMCSD_THREAD_PRIORITY 22
 #define RT_MMCSD_MAX_PARTITION 16
+#define RT_USING_SPI
+#define RT_USING_SFUD
+#define RT_SFUD_USING_SFDP
+#define RT_SFUD_USING_FLASH_INFO_TABLE
+#define RT_SFUD_SPI_MAX_HZ 50000000
+#define RT_USING_AUDIO
+#define RT_AUDIO_REPLAY_MP_BLOCK_SIZE 4096
+#define RT_AUDIO_REPLAY_MP_BLOCK_COUNT 2
+#define RT_AUDIO_RECORD_PIPE_SIZE 2048
 #define RT_USING_BLK
 
 /* Partition Types */
@@ -199,7 +210,6 @@
 #define RT_CHERRYUSB_HOST
 #define RT_CHERRYUSB_HOST_DWC2_CUSTOM
 #define RT_CHERRYUSB_HOST_HID
-#define RT_CHERRYUSB_HOST_MSC
 #define RT_LWIP_PBUF_POOL_BUFSIZE 1600
 /* end of Device Drivers */
 
@@ -351,11 +361,21 @@
 
 /* LVGL: powerful and easy-to-use embedded GUI library */
 
+#define PKG_USING_LVGL
+#define PKG_LVGL_THREAD_PRIO 20
+#define PKG_LVGL_THREAD_STACK_SIZE 8192
+#define PKG_LVGL_DISP_REFR_PERIOD 5
+#define PKG_LVGL_USING_V080311
+#define PKG_LVGL_VER_NUM 0x080311
 /* end of LVGL: powerful and easy-to-use embedded GUI library */
 
 /* u8g2: a monochrome graphic library */
 
 /* end of u8g2: a monochrome graphic library */
+#define PKG_USING_WAVPLAYER
+#define PKG_WP_USING_PLAY
+#define PKG_WP_PLAY_DEVICE "sound0"
+#define PKG_USING_WAVPLAYER_LATEST_VERSION
 /* end of multimedia packages */
 
 /* tools packages */
@@ -396,6 +416,14 @@
 /* Kendryte SDK */
 
 /* end of Kendryte SDK */
+
+/* WCH HAL & SDK Drivers */
+
+/* end of WCH HAL & SDK Drivers */
+
+/* AT32 HAL & SDK Drivers */
+
+/* end of AT32 HAL & SDK Drivers */
 /* end of HAL & SDK Drivers */
 
 /* sensors drivers */
@@ -428,6 +456,8 @@
 /* entertainment: terminal games and other interesting software packages */
 
 /* end of entertainment: terminal games and other interesting software packages */
+#define PKG_USING_OPTPARSE
+#define PKG_USING_OPTPARSE_LATEST_VERSION
 /* end of miscellaneous packages */
 
 /* Arduino libraries */
@@ -487,9 +517,14 @@
 #define BSP_USING_USB_HOST
 #define BSP_USING_USB_TO_USART
 #define BSP_USING_SDRAM
+#define BSP_USING_SPI_FLASH
 #define PHY_USING_LAN8720A
 #define BSP_USING_ETH
 #define BSP_USING_SDCARD
+#define BSP_USING_AUDIO
+#define BSP_USING_SPI_LCD
+#define BSP_USING_LVGL
+#define BSP_USING_LVGL_DEMO
 /* end of Onboard Peripheral Drivers */
 
 /* On-chip Peripheral Drivers */
@@ -498,6 +533,13 @@
 #define BSP_USING_UART
 #define BSP_STM32_UART_V1_TX_TIMEOUT 3000
 #define BSP_USING_UART1
+#define BSP_USING_SPI
+#define BSP_USING_SPI1
+#define BSP_SPI1_TX_USING_DMA
+#define BSP_USING_SPI5
+#define BSP_USING_PWM
+#define BSP_USING_PWM2
+#define BSP_USING_PWM2_CH3
 #define BSP_USING_SDIO
 #define BSP_USING_FMC
 /* end of On-chip Peripheral Drivers */

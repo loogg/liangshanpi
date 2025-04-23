@@ -386,6 +386,10 @@ static rt_ssize_t _audio_dev_write(struct rt_device *dev, rt_off_t pos, const vo
     ptr = (rt_uint8_t *)buffer;
     block_size = RT_AUDIO_REPLAY_MP_BLOCK_SIZE;
 
+    if (audio->ops->data_pre) {
+        audio->ops->data_pre(audio, (void *)ptr, size);
+    }
+
     rt_mutex_take(&audio->replay->lock, RT_WAITING_FOREVER);
     while (index < size)
     {

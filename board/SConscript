@@ -12,6 +12,10 @@ board.c
 CubeMX_Config/Src/stm32f4xx_hal_msp.c
 ''')
 
+path =  [cwd]
+path += [cwd + '/CubeMX_Config/Inc']
+path += [cwd + '/ports']
+
 if GetDepend(['BSP_USING_ETH']):
     src += Glob('ports/phy_reset.c')
 
@@ -22,17 +26,7 @@ if GetDepend(['BSP_USING_SDCARD']):
     src += Glob('ports/sdcard_port.c')
 
 if GetDepend(['BSP_USING_AUDIO']):
-    src += Glob('ports/audio/drv_wm8978.c')
     src += Glob('ports/audio/drv_sound.c')
-
-if GetDepend(['BSP_USING_AUDIO_RECORD']):
-    src += Glob('ports/audio/drv_mic.c')
-
-path =  [cwd]
-path += [cwd + '/CubeMX_Config/Inc']
-path += [cwd + '/ports']
-
-if GetDepend(['BSP_USING_AUDIO']):
     path += [cwd + '/ports/audio']
 
 if GetDepend(['RT_USING_CHERRYUSB']):
@@ -40,6 +34,17 @@ if GetDepend(['RT_USING_CHERRYUSB']):
     src += Glob('ports/CherryUSB/demo/*.c')
     path += [cwd + '/ports/CherryUSB']
     path += [cwd + '/ports/CherryUSB/demo']
+
+if GetDepend(['PKG_USING_LVGL']):
+    src += Glob('ports/LVGL/*.c')
+    path += [cwd + '/ports/LVGL']
+    if GetDepend(['BSP_USING_LVGL_DEMO']):
+        src += Glob('ports/LVGL/demo/*.c')
+        path += [cwd + '/ports/LVGL/demo']
+
+if GetDepend(['BSP_USING_SPI_LCD']):
+    src += Glob('ports/lcd/*.c')
+    path += [cwd + '/ports/lcd']
 
 src += Glob('ports/romfs.c')
 

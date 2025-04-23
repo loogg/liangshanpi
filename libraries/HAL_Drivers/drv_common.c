@@ -189,8 +189,6 @@ rt_weak void rt_hw_board_init(void)
     /* System clock initialization */
     SystemClock_Config();
 
-    rt_kprintf("HCLK freq: %U\r\n", HAL_RCC_GetHCLKFreq());
-
 #if defined(RT_USING_HEAP)
     /* Heap initialization */
     rt_system_heap_init((void *)HEAP_BEGIN, (void *)HEAP_END);

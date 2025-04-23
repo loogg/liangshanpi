@@ -85,21 +85,43 @@ menu "Onboard Peripheral Drivers"
         default n
 
     config BSP_USING_AUDIO
-        bool "Enable AUDIO (WM8978)"
-        select BSP_USING_I2C1
+        bool "Enable AUDIO (DAC CH2)"
         select RT_USING_AUDIO
         default n
 
-        if BSP_USING_AUDIO
-            config BSP_USING_AUDIO_PLAY
-            bool "Enable Audio Play"
-            default y
+    config BSP_USING_SPI_LCD
+        bool "Enable LCD (spi1)"
+        select BSP_USING_SPI
+        select BSP_USING_SPI1
+        select BSP_SPI1_TX_USING_DMA
+        select BSP_USING_PWM
+        select BSP_USING_PWM2
+        select BSP_USING_PWM2_CH3
+        default n
 
-            config BSP_USING_AUDIO_RECORD
-            bool "Enable Audio Record"
-            select BSP_USING_AUDIO_PLAY
-            default n
-        endif
+    config BSP_USING_LCD_SAMPLE
+        bool "Enable LCD raw driver sample"
+        depends on BSP_USING_SPI_LCD && !BSP_USING_LVGL
+        default n
+
+    config BSP_USING_LCD_QRCODE
+        bool "Enable LCD to show QRCode"
+        depends on BSP_USING_SPI_LCD && !BSP_USING_LVGL
+        select BSP_USING_LCD_SAMPLE
+        select PKG_USING_QRCODE
+        default n
+
+    config BSP_USING_LVGL
+        bool "Enable LVGL for LCD"
+        select PKG_USING_LVGL
+        select BSP_USING_SPI_LCD
+        default n
+
+    if BSP_USING_LVGL
+        config BSP_USING_LVGL_DEMO
+            bool "Enable LVGL demo"
+            default y
+    endif
 
 endmenu
 
@@ -258,8 +280,8 @@ menu "On-chip Peripheral Drivers"
             bool "Enable timer2 output PWM"
             default n
             if BSP_USING_PWM2
-                config BSP_USING_PWM2_CH4
-                    bool "Enable PWM2 channel4"
+                config BSP_USING_PWM2_CH3
+                    bool "Enable PWM2 channel3"
                     default n
             endif
         endif

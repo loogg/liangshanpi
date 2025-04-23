@@ -13,7 +13,8 @@ void usbh_hid_callback(void *arg, int nbytes)
             USB_LOG_RAW("0x%02x ", hid_buffer[i]);
         }
         USB_LOG_RAW("nbytes:%d\r\n", nbytes);
-        // usbh_hid_keybrd_decode(hid_buffer);
+        if (nbytes <= 8)
+            usbh_hid_mouse_decode(hid_buffer);
         usbh_int_urb_fill(&hid_class->intin_urb, hid_class->hport, hid_class->intin, hid_buffer, hid_class->intin->wMaxPacketSize, 0, usbh_hid_callback, hid_class);
         usbh_submit_urb(&hid_class->intin_urb);
     } else if (nbytes == -USB_ERR_NAK) { /* only dwc2 should do this */
@@ -29,7 +30,7 @@ static void usbh_hid_thread(CONFIG_USB_OSAL_THREAD_SET_ARGV)
     struct usbh_hid *hid_class = (struct usbh_hid *)CONFIG_USB_OSAL_THREAD_GET_ARGV;
     ;
 
-    usbh_hid_keybrd_init();
+    usbh_hid_mouse_init();
     /* test with only one buffer, if you have more hid class, modify by yourself */
 
     /* Suggest you to use timer for int transfer and use ep interval */

@@ -57,8 +57,9 @@ OF SUCH DAMAGE.
 #define KBD_PRESSED_MAX_NUM                    6U                             /*!< keyboard pressed maximum number */
 
 typedef struct _mouse_report_data {
-    uint8_t x;                                                                /*!< X coordinate value */
-    uint8_t y;                                                                /*!< Y coordinate value */
+    int16_t x;                                                                /*!< X coordinate value */
+    int16_t y;
+    int8_t  wheel;                                                           /*!< Y coordinate value */
     uint8_t buttons[3];                                                       /*!< button buff */
 } mouse_report_data;
 
