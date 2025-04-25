@@ -12,10 +12,22 @@
 #include "gui_guider.h"
 #include "custom.h"
 
+#define DBG_TAG "lvgl.pro"
+#define DBG_LVL DBG_INFO
+#include <rtdbg.h>
+
+extern int sdcard_check_mount(void);
+
 lv_ui guider_ui;
+lv_font_t *lv_font_sc_regular_14 = NULL;
 
 void lv_user_gui_init(void)
 {
+    while(!sdcard_check_mount())
+    {
+        rt_thread_mdelay(200);
+    }
+
     setup_ui(&guider_ui);
     custom_init(&guider_ui);
 }

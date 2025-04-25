@@ -18,6 +18,13 @@
 
 #include <dfs_romfs.h>
 #include <dfs_fs.h>
+#include <dfs_file.h>
+#include <poll.h>
+#include <unistd.h>
+
+#define DBG_TAG    "main"
+#define DBG_LVL    DBG_INFO
+#include <rtdbg.h>
 
 #define LED0_PIN    GET_PIN(E, 3)
 
@@ -44,3 +51,59 @@ int main(void)
         rt_thread_mdelay(500);
     }
 }
+
+#include "nes.h"
+
+static void nes_thread_entry(void* parameter) {
+    const char* nes_file_path = (const char*)parameter;
+
+    nes_t* nes = nes_init();
+
+    do {
+        int ret = nes_load_file(nes, nes_file_path);
+        if (ret) {
+            NES_LOG_ERROR("nes load file fail\n");
+            break;
+        }
+
+        nes_run(nes);
+        nes_unload_file(nes);
+    } while (0);
+
+    nes_deinit(nes);
+}
+
+
+static int nes_start(int argc, char* argv[]) {
+    static char nes_file_path[256];
+    if (argc == 2) {
+        snprintf(nes_file_path, sizeof(nes_file_path), "%s", argv[1]);
+        size_t nes_file_path_len = strlen(nes_file_path);
+        if (nes_memcmp(nes_file_path+nes_file_path_len-4,".nes",4)==0 || nes_memcmp(nes_file_path+nes_file_path_len-4,".NES",4)==0){
+            NES_LOG_INFO("nes_file_path:%s\n",nes_file_path);
+            rt_thread_t tid = rt_thread_create("nes", nes_thread_entry, nes_file_path, 4096, 5, 10);
+            if (tid == RT_NULL) {
+                rt_kprintf("Can't create nes thread!\n");
+                return -1;
+            }
+            rt_thread_startup(tid);
+            return 0;
+        } else {
+            rt_kprintf("Please enter xxx.nes\n");
+            return -1;
+        }
+    } else {
+        rt_kprintf("Please enter the nes file path\n");
+        return -1;
+    }
+}
+MSH_CMD_EXPORT(nes_start, start nes emulator);
+
+uint32_t nes_run_max_tick = 0;
+
+static int show_nes_run_max_tick(int argc, char* argv[]) {
+    rt_kprintf("nes_run_max_tick:%d\n", nes_run_max_tick);
+    return 0;
+}
+MSH_CMD_EXPORT(show_nes_run_max_tick, show nes run max tick);
+

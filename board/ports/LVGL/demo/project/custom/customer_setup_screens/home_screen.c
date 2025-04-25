@@ -19,5 +19,14 @@ void home_screen_custom_setup(lv_ui *ui) {
     lv_obj_align(_music_btn, LV_ALIGN_CENTER, 0, 0);
     lv_label_set_text(lv_label_create(_music_btn), LV_SYMBOL_AUDIO);
 
+
+
+    lv_obj_t * img;
+    img = lv_gif_create(ui->Home);
+    /* Assuming a File system is attached to letter 'A'
+     * E.g. set LV_USE_FS_STDIO 'A' in lv_conf.h */
+    lv_gif_set_src(img, "S:/sdio/bulb.gif");
+    lv_obj_align(img, LV_ALIGN_RIGHT_MID, -20, 0);
+
     lv_obj_add_event_cb(_music_btn, _screen_btn_event_cb, LV_EVENT_ALL, ui);
 }

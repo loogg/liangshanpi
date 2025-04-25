@@ -1,0 +1,12 @@
+from building import *
+
+cwd     = GetCurrentDir()
+path = [cwd]
+src     = Glob('src/*.c')
+src += Glob('src/nes_mapper/*.c')
+
+path += [cwd + '/inc']
+
+group = DefineGroup('nes', src, depend = [''], CPPPATH = path)
+
+Return('group')

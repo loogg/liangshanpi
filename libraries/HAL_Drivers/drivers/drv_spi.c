@@ -1039,10 +1039,15 @@ void HAL_SPI_TxRxCpltCallback(SPI_HandleTypeDef *hspi)
     rt_completion_done(&spi_drv->cpt);
 }
 
+void lcd_spi_dma_tx_cplt_callback(SPI_HandleTypeDef *hspi);
 void HAL_SPI_TxCpltCallback(SPI_HandleTypeDef *hspi)
 {
     struct stm32_spi *spi_drv =  rt_container_of(hspi, struct stm32_spi, handle);
     rt_completion_done(&spi_drv->cpt);
+
+    if (hspi->Instance == SPI1) {
+        lcd_spi_dma_tx_cplt_callback(hspi);
+    }
 }
 
 void HAL_SPI_RxCpltCallback(SPI_HandleTypeDef *hspi)

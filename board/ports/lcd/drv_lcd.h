@@ -13,9 +13,14 @@
 #define __DRV_LCD_H__
 
 #include <rtthread.h>
+#include <rtdevice.h>
 
 #define LCD_W 240
 #define LCD_H 280
+#define LCD_BITS_PER_PIXEL  16
+#define LCD_BYTES_PER_PIXEL  (LCD_BITS_PER_PIXEL / 8)
+#define LCD_BUF_SIZE        (LCD_W * LCD_H * LCD_BYTES_PER_PIXEL)
+#define LCD_PIXEL_FORMAT    RTGRAPHIC_PIXEL_FORMAT_RGB565
 
 #ifndef BSP_USING_LVGL
 #define WHITE            0xFFFF

@@ -59,6 +59,9 @@ if GetDepend(['BSP_USING_SPI_LCD']):
     src += Glob('ports/lcd/*.c')
     path += [cwd + '/ports/lcd']
 
+src += Glob('ports/nes/*.c')
+path += [cwd + '/ports/nes']
+
 src += Glob('ports/romfs.c')
 
 startup_path_prefix = SDK_LIB

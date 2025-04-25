@@ -25,6 +25,8 @@
 #define DBG_LVL DBG_INFO
 #include <rtdbg.h>
 
+static uint8_t _mounted = 0;
+
 void sd_mount(void *parameter)
 {
     while (1)
@@ -35,6 +37,7 @@ void sd_mount(void *parameter)
             if (dfs_mount("sd0", "/sdio", "elm", 0, 0) == RT_EOK)
             {
                 LOG_I("sd card mount to '/sdio'");
+                _mounted = 1;
                 break;
             }
             else
@@ -49,6 +52,10 @@ void sd_mount(void *parameter)
         rt_thread_mdelay(1000);
     }
 
+}
+
+int sdcard_check_mount(void) {
+    return _mounted;
 }
 
 int stm32_sdcard_mount(void)

@@ -44,6 +44,12 @@
 #define LV_USE_TILEVIEW   0
 #define LV_USE_WIN        0
 
+#define LV_USE_FS_STDIO        1
+#define LV_FS_STDIO_LETTER     'S'
+#define LV_FS_STDIO_CACHE_SIZE 4096
+
+#define LV_USE_GIF 1
+
 // #define LV_USE_DEMO_WIDGETS 1
 
 // #ifdef PKG_USING_LV_MUSIC_DEMO
