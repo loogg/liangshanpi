@@ -24,7 +24,7 @@
 #define NES_ENABLE_SOUND        (0)       /* enable sound */
 #define NES_USE_SRAM            (1)       /* use SRAM */
 
-#define NES_FRAME_SKIP          (0)       /* skip frames */
+#define NES_FRAME_SKIP          (3)       /* skip frames */
 /* Color depth:
  * - 16: RGB565
  * - 32: ARGB8888
