@@ -578,7 +578,6 @@ void nes_emulate_frame(void)
     while (1)
     {
         rt_thread_mdelay(2);
-        rt_tick_t t1 = rt_tick_get();
 
         /*  LINES 0-239 */
         PPU_start_frame();
@@ -587,6 +586,7 @@ void nes_emulate_frame(void)
             _lcd_get_framebuffer(); /* 获取LCD显示缓存 */
         }
 
+        rt_tick_t t1 = rt_tick_get();
         for (NES_scanline = 0; NES_scanline < 240; NES_scanline++)
         {
             run6502(113*256);
@@ -595,6 +595,9 @@ void nes_emulate_frame(void)
             if (nes_frame == 0) scanline_draw(NES_scanline);
             else do_scanline_and_dont_draw(NES_scanline);
         }
+        rt_tick_t t2 = rt_tick_get();
+        rt_tick_t t_diff = t2 - t1;
+        rt_kprintf("nes frame time:%u\r\n", t_diff);
 
         if (nes_frame == 0) {
             _lcd_frame_draw(); /* 刷新LCD显示缓存 */
@@ -633,10 +636,6 @@ void nes_emulate_frame(void)
         }
 
         nes_set_window();               /* 设置窗口 */
-
-        rt_tick_t t2 = rt_tick_get();
-        rt_tick_t t_diff = t2 - t1;
-        // rt_kprintf("nes frame time:%u\r\n", t_diff);
     }
 }
 

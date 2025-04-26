@@ -295,7 +295,7 @@ void nes_run(nes_t* nes){
 
     while (!nes->nes_quit){
         // NES_LOG_DEBUG("frame_cnt:%d\n",frame_cnt);
-        rt_tick_t t1 = rt_tick_get();
+
         frame_cnt++;
         nes_get_framebuffer(nes);
         nes_palette_generate(nes);
@@ -306,6 +306,7 @@ void nes_run(nes_t* nes){
 #if (NES_ENABLE_SOUND==1)
         nes_apu_frame(nes);
 #endif
+        rt_tick_t t1 = rt_tick_get();
         // https://www.nesdev.org/wiki/PPU_rendering#Visible_scanlines_(0-239)
         for(scanline = 0; scanline < NES_HEIGHT; scanline++) { // 0-239 Visible frame
             if (nes->nes_ppu.MASK_b){
@@ -359,6 +360,9 @@ void nes_run(nes_t* nes){
             }
 #endif
         }
+        rt_tick_t t2 = rt_tick_get();
+        rt_tick_t t_diff = t2 - t1;
+        rt_kprintf("t_diff:%u\n",t_diff);
 #if (NES_RAM_LACK == 0)
         if((frame_cnt % (NES_FRAME_SKIP+1))==0){
             nes_draw(0, 0, NES_WIDTH-1, NES_HEIGHT-1, nes->nes_draw_data);
@@ -383,10 +387,6 @@ void nes_run(nes_t* nes){
             nes->nes_ppu.v_reg = (nes->nes_ppu.v_reg & (uint16_t)0x841F) | (nes->nes_ppu.t_reg & (uint16_t)0x7BE0);
         }
         nes_frame(nes);
-
-        rt_tick_t t2 = rt_tick_get();
-        rt_tick_t t_diff = t2 - t1;
-        // rt_kprintf("t_diff:%u\n",t_diff);
     }
 }
 
