@@ -157,20 +157,27 @@
         <Bp>
           <Number>0</Number>
           <Type>0</Type>
-          <LineNumber>22</LineNumber>
+          <LineNumber>190</LineNumber>
           <EnabledFlag>1</EnabledFlag>
-          <Address>134356952</Address>
+          <Address>134456814</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
           <SizeOfObject>0</SizeOfObject>
           <BreakByAccess>0</BreakByAccess>
           <BreakIfRCount>1</BreakIfRCount>
-          <Filename>board\ports\CherryUSB\demo\usbh_hid_template.c</Filename>
+          <Filename>libraries\HAL_Drivers\drv_common.c</Filename>
           <ExecCommand></ExecCommand>
-          <Expression>\\rt_thread\board/ports/CherryUSB/demo/usbh_hid_template.c\22</Expression>
+          <Expression>\\rt_thread\libraries/HAL_Drivers/drv_common.c\190</Expression>
         </Bp>
       </Breakpoint>
+      <WatchWindow1>
+        <Ww>
+          <count>0</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>SystemCoreClock,0x0A</ItemText>
+        </Ww>
+      </WatchWindow1>
       <Tracepoint>
         <THDelay>0</THDelay>
       </Tracepoint>
