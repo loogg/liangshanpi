@@ -239,7 +239,9 @@ int nes_initex(nes_t *nes){
         return -RT_ERROR;
     }
 
-    key_mb = rt_mb_create("key_mb", 32, RT_IPC_FLAG_FIFO);
+    if (key_mb == RT_NULL) {
+        key_mb = rt_mb_create("key_mb", 32, RT_IPC_FLAG_FIFO);
+    }
 
     return 0;
 }
@@ -248,6 +250,11 @@ int nes_deinitex(nes_t *nes){
     if (_sound_device != RT_NULL) {
         rt_device_close(_sound_device);
         _sound_device = RT_NULL;
+    }
+
+    if (_lcd_device != RT_NULL) {
+        rt_device_close(_lcd_device);
+        _lcd_device = RT_NULL;
     }
 
     return 0;

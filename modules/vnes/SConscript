@@ -1,0 +1,12 @@
+from building import *
+
+cwd     = GetCurrentDir()
+path = [cwd]
+
+src     = Glob('*.c')
+src += Glob('6502.s')
+
+
+group = DefineGroup('vnes', src, depend = ['BSP_USING_NES_OPENEDV'], CPPPATH = path)
+
+Return('group')

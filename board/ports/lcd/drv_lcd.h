@@ -64,5 +64,5 @@ void lcd_display_brightness(rt_uint8_t percent);
 
 void lcd_address_set(rt_uint16_t x1, rt_uint16_t y1, rt_uint16_t x2, rt_uint16_t y2);
 void lcd_fill_array(rt_uint16_t x_start, rt_uint16_t y_start, rt_uint16_t x_end, rt_uint16_t y_end, void *pcolor);
-
+void lcd_fill_line_data(void *pcolor, int size);
 #endif

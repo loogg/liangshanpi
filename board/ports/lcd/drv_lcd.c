@@ -118,6 +118,7 @@ static void lcd_gpio_init(void)
 
     rt_pin_mode(LCD_DC_PIN, PIN_MODE_OUTPUT);
     rt_pin_mode(LCD_RES_PIN, PIN_MODE_OUTPUT);
+    rt_pin_mode(GET_PIN(B, 10), PIN_MODE_OUTPUT); /* backlight pin */
 
     rt_pin_write(LCD_RES_PIN, PIN_LOW);
     rt_thread_delay(RT_TICK_PER_SECOND / 10); /* wait at least 100ms for reset */
@@ -232,31 +233,33 @@ void lcd_set_color(rt_uint16_t back, rt_uint16_t fore)
 }
 #endif /* BSP_USING_LVGL */
 
-void lcd_display_brightness(rt_uint8_t percent)
-{
-    struct rt_device_pwm *pwm_dev;
+// void lcd_display_brightness(rt_uint8_t percent)
+// {
+//     struct rt_device_pwm *pwm_dev;
 
-    if(percent > 100)
-    {
-        percent = 100;
-    }
+//     if(percent > 100)
+//     {
+//         percent = 100;
+//     }
 
-    pwm_dev = (struct rt_device_pwm*)rt_device_find("pwm2");
-    if(pwm_dev != RT_NULL)
-    {
-        rt_pwm_set(pwm_dev, 3, 1000000, percent*10000); /* PB10, PWM2 CH3 with 1000Hz */
-        rt_pwm_enable(pwm_dev, 3);
-    }
-}
+//     pwm_dev = (struct rt_device_pwm*)rt_device_find("pwm2");
+//     if(pwm_dev != RT_NULL)
+//     {
+//         rt_pwm_set(pwm_dev, 3, 1000000, percent*10000); /* PB10, PWM2 CH3 with 1000Hz */
+//         rt_pwm_enable(pwm_dev, 3);
+//     }
+// }
 
 void lcd_display_on(void)
 {
-    lcd_display_brightness(100);
+    // lcd_display_brightness(100);
+    rt_pin_write(GET_PIN(B, 10), PIN_HIGH); /* backlight on */
 }
 
 void lcd_display_off(void)
 {
-    lcd_display_brightness(0);
+    // lcd_display_brightness(0);
+    rt_pin_write(GET_PIN(B, 10), PIN_LOW); /* backlight off */
 }
 
 /* lcd enter the minimum power consumption mode and backlight off. */
@@ -471,6 +474,10 @@ void lcd_fill_array(rt_uint16_t x_start, rt_uint16_t y_start, rt_uint16_t x_end,
     lcd_address_set(x_start, y_start, x_end, y_end);
     rt_pin_write(LCD_DC_PIN, PIN_HIGH);
     rt_spi_send(spi_dev_lcd, pcolor, size);
+}
+void lcd_fill_line_data(void *pcolor, int size) {
+    rt_pin_write(LCD_DC_PIN, PIN_HIGH);
+    rt_spi_send(spi_dev_lcd, pcolor, size * LCD_BYTES_PER_PIXEL);
 }
 
 #ifndef BSP_USING_LVGL

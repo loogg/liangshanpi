@@ -7,6 +7,6 @@ src += Glob('src/nes_mapper/*.c')
 
 path += [cwd + '/inc']
 
-group = DefineGroup('nes', src, depend = [''], CPPPATH = path)
+group = DefineGroup('nes', src, depend = ['BSP_USING_NES_C'], CPPPATH = path)
 
 Return('group')

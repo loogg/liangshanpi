@@ -176,7 +176,6 @@
 #define RT_USING_SERIAL
 #define RT_USING_SERIAL_V1
 #define RT_SERIAL_RB_BUFSZ 64
-#define RT_USING_PWM
 #define RT_USING_SDIO
 #define RT_SDIO_STACK_SIZE 512
 #define RT_SDIO_THREAD_PRIORITY 15
@@ -200,6 +199,7 @@
 #define RT_BLK_PARTITION_EFI
 /* end of Partition Types */
 #define RT_USING_PIN
+#define RT_USING_HWTIMER
 #define RT_USING_CHERRYUSB
 #define RT_CHERRYUSB_DEVICE
 #define RT_CHERRYUSB_DEVICE_SPEED_FS
@@ -515,6 +515,8 @@
 #define BSP_USING_USB
 #define BSP_USING_USB_OTG_HS
 #define BSP_USING_USB_HOST
+#define BSP_USING_NES
+#define BSP_USING_NES_OPENEDV
 #define BSP_USING_USB_TO_USART
 #define BSP_USING_SDRAM
 #define BSP_USING_SPI_FLASH
@@ -537,9 +539,8 @@
 #define BSP_USING_SPI1
 #define BSP_SPI1_TX_USING_DMA
 #define BSP_USING_SPI5
-#define BSP_USING_PWM
-#define BSP_USING_PWM2
-#define BSP_USING_PWM2_CH3
+#define BSP_USING_TIM
+#define BSP_USING_TIM11
 #define BSP_USING_SDIO
 #define BSP_USING_FMC
 /* end of On-chip Peripheral Drivers */

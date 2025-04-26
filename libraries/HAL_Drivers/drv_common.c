@@ -203,6 +203,15 @@ rt_weak void rt_hw_board_init(void)
 #endif
 
 #if defined(RT_USING_CONSOLE) && defined(RT_USING_DEVICE)
+    rt_device_t _dev = rt_device_find(RT_CONSOLE_DEVICE_NAME);
+    if (_dev != RT_NULL) {
+        struct serial_configure config = ((struct rt_serial_device *)_dev)->config;
+        config.baud_rate = 115200;
+        config.data_bits = DATA_BITS_8;
+        config.stop_bits = STOP_BITS_1;
+        config.parity = PARITY_NONE;
+        rt_device_control(_dev, RT_DEVICE_CTRL_CONFIG, &config);
+    }
     /* Set the shell console output device */
     rt_console_set_device(RT_CONSOLE_DEVICE_NAME);
 #endif

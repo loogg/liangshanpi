@@ -52,6 +52,9 @@ int main(void)
     }
 }
 
+#ifdef BSP_USING_NES
+
+#ifdef BSP_USING_NES_C
 #include "nes.h"
 
 static void nes_thread_entry(void* parameter) {
@@ -72,16 +75,26 @@ static void nes_thread_entry(void* parameter) {
 
     nes_deinit(nes);
 }
+#endif /* BSP_USING_NES_C */
 
+#ifdef BSP_USING_NES_OPENEDV
+#include "nes_main.h"
+
+static void nes_thread_entry(void* parameter) {
+    const char* nes_file_path = (const char*)parameter;
+
+    nes_load(nes_file_path);
+}
+#endif
 
 static int nes_start(int argc, char* argv[]) {
     static char nes_file_path[256];
     if (argc == 2) {
         snprintf(nes_file_path, sizeof(nes_file_path), "%s", argv[1]);
         size_t nes_file_path_len = strlen(nes_file_path);
-        if (nes_memcmp(nes_file_path+nes_file_path_len-4,".nes",4)==0 || nes_memcmp(nes_file_path+nes_file_path_len-4,".NES",4)==0){
-            NES_LOG_INFO("nes_file_path:%s\n",nes_file_path);
-            rt_thread_t tid = rt_thread_create("nes", nes_thread_entry, nes_file_path, 4096, 5, 10);
+        if (memcmp(nes_file_path+nes_file_path_len-4,".nes",4)==0 || memcmp(nes_file_path+nes_file_path_len-4,".NES",4)==0){
+            rt_kprintf("nes_file_path:%s\n",nes_file_path);
+            rt_thread_t tid = rt_thread_create("nes", nes_thread_entry, nes_file_path, 4096, 21, 10);
             if (tid == RT_NULL) {
                 rt_kprintf("Can't create nes thread!\n");
                 return -1;
@@ -99,11 +112,4 @@ static int nes_start(int argc, char* argv[]) {
 }
 MSH_CMD_EXPORT(nes_start, start nes emulator);
 
-uint32_t nes_run_max_tick = 0;
-
-static int show_nes_run_max_tick(int argc, char* argv[]) {
-    rt_kprintf("nes_run_max_tick:%d\n", nes_run_max_tick);
-    return 0;
-}
-MSH_CMD_EXPORT(show_nes_run_max_tick, show nes run max tick);
-
+#endif /* BSP_USING_NES */

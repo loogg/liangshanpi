@@ -31,6 +31,22 @@ menu "Onboard Peripheral Drivers"
             endchoice
         endif
 
+    menuconfig BSP_USING_NES
+        bool "Enable NES simulator"
+        default n
+        if BSP_USING_NES
+            choice
+                prompt "Select NES simulator"
+                default BSP_USING_NES_OPENEDV
+
+                config BSP_USING_NES_C
+                    bool "NES C simulator"
+
+                config BSP_USING_NES_OPENEDV
+                    bool "NES openedv simulator"
+            endchoice
+        endif
+
     config BSP_USING_USB_TO_USART
         bool "Enable USB TO USART (uart1)"
         select BSP_USING_UART
@@ -94,9 +110,6 @@ menu "Onboard Peripheral Drivers"
         select BSP_USING_SPI
         select BSP_USING_SPI1
         select BSP_SPI1_TX_USING_DMA
-        select BSP_USING_PWM
-        select BSP_USING_PWM2
-        select BSP_USING_PWM2_CH3
         default n
 
     config BSP_USING_LCD_SAMPLE
