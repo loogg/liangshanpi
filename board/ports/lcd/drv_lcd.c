@@ -43,7 +43,11 @@ static int rt_hw_lcd_config(void)
         struct rt_spi_configuration cfg = {0};
         cfg.data_width = 8;
         cfg.mode = RT_SPI_MASTER | RT_SPI_MODE_0 | RT_SPI_MSB;
+#if defined(BSP_CPU_CLK_168MHZ)
         cfg.max_hz = 42 * 1000 * 1000; /* 42M,SPI max 42MHz,lcd 4-wire spi */
+#elif defined(BSP_CPU_CLK_240MHZ)
+        cfg.max_hz = 60 * 1000 * 1000; /* 60M,SPI max 60MHz,lcd 4-wire spi */
+#endif
 
         rt_spi_configure(spi_dev_lcd, &cfg);
     }

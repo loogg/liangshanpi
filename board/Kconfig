@@ -47,6 +47,17 @@ menu "Onboard Peripheral Drivers"
             endchoice
         endif
 
+    choice
+        prompt "Select CPU CLK"
+        default BSP_CPU_CLK_240MHZ
+
+        config BSP_CPU_CLK_168MHZ
+            bool "168M HZ"
+
+        config BSP_CPU_CLK_240MHZ
+            bool "240M HZ"
+    endchoice
+
     config BSP_USING_USB_TO_USART
         bool "Enable USB TO USART (uart1)"
         select BSP_USING_UART

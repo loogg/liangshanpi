@@ -24,10 +24,17 @@
 #define SDRAM_ROW_BITS                  13
 /* cas latency clock number: 1, 2, 3 */
 #define SDRAM_CAS_LATENCY               3
+#if defined(BSP_CPU_CLK_168MHZ)
 /* read pipe delay: 0, 1, 2 */
 #define SDRAM_RPIPE_DELAY               1
 /* clock divid: 2, 3 */
 #define SDCLOCK_PERIOD                  2
+#elif defined(BSP_CPU_CLK_240MHZ)
+/* read pipe delay: 0, 1, 2 */
+#define SDRAM_RPIPE_DELAY               2
+/* clock divid: 2, 3 */
+#define SDCLOCK_PERIOD                  3
+#endif
 /* refresh rate counter */
 #define SDRAM_REFRESH_COUNT             ((uint32_t)0x02AB)
 #define SDRAM_SIZE                      ((uint32_t)0x2000000)

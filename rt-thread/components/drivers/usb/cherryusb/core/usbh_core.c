@@ -592,6 +592,9 @@ int usbh_enumerate(struct usbh_hubport *hport)
         hport->config.intf[i].class_driver = class_driver;
         USB_LOG_INFO("Loading %s class driver\r\n", class_driver->driver_name);
         ret = CLASS_CONNECT(hport, i);
+        if (intf_desc->bInterfaceClass == USB_DEVICE_CLASS_HID) {
+            break;
+        }
     }
 
 errout:

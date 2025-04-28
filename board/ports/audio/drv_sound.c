@@ -22,9 +22,23 @@ DMA_HandleTypeDef hdma_dac2;
 
 /* sample_rate, arr, psc */
 static const rt_uint32_t _PSC_TBL[][3] = {
-    {AUDIO_FREQUENCY_048K, 10 - 1, 175 - 1},  {AUDIO_FREQUENCY_044K, 15 - 1, 127 - 1}, {AUDIO_FREQUENCY_032K, 15 - 1, 175 - 1},
-    {AUDIO_FREQUENCY_022K, 10 - 1, 381 - 1},  {AUDIO_FREQUENCY_016K, 10 - 1, 525 - 1}, {AUDIO_FREQUENCY_011K, 20 - 1, 381 - 1},
+#if defined(BSP_CPU_CLK_168MHZ)
+    {AUDIO_FREQUENCY_048K, 10 - 1, 175 - 1},
+    {AUDIO_FREQUENCY_044K, 15 - 1, 127 - 1},
+    {AUDIO_FREQUENCY_032K, 15 - 1, 175 - 1},
+    {AUDIO_FREQUENCY_022K, 10 - 1, 381 - 1},
+    {AUDIO_FREQUENCY_016K, 10 - 1, 525 - 1},
+    {AUDIO_FREQUENCY_011K, 20 - 1, 381 - 1},
     {AUDIO_FREQUENCY_008K, 100 - 1, 105 - 1},
+#elif defined(BSP_CPU_CLK_240MHZ)
+    {AUDIO_FREQUENCY_048K, 10 - 1, 250 - 1},
+    {AUDIO_FREQUENCY_044K, 3 - 1,  907 - 1},
+    {AUDIO_FREQUENCY_032K, 10 - 1, 375 - 1},
+    {AUDIO_FREQUENCY_022K, 6 - 1,  907 - 1},
+    {AUDIO_FREQUENCY_016K, 10 - 1, 750 - 1},
+    {AUDIO_FREQUENCY_011K, 12 - 1, 907 - 1},
+    {AUDIO_FREQUENCY_008K, 100 - 1, 150 - 1},
+#endif
 };
 
 static void MX_TIM6_Init(void) {

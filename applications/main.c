@@ -52,6 +52,15 @@ int main(void)
     }
 }
 
+void show_all_clk(void) {
+    rt_kprintf("SystemCoreClock:%d\n", SystemCoreClock);
+    rt_kprintf("HAL_RCC_GetSysClockFreq:%d\n", HAL_RCC_GetSysClockFreq());
+    rt_kprintf("HAL_RCC_GetHCLKFreq:%d\n", HAL_RCC_GetHCLKFreq());
+    rt_kprintf("HAL_RCC_GetPCLK1Freq:%d\n", HAL_RCC_GetPCLK1Freq());
+    rt_kprintf("HAL_RCC_GetPCLK2Freq:%d\n", HAL_RCC_GetPCLK2Freq());
+}
+MSH_CMD_EXPORT(show_all_clk, show all clock frequency);
+
 #ifdef BSP_USING_NES
 
 #ifdef BSP_USING_NES_C
