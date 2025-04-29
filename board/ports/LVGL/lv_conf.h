@@ -44,6 +44,10 @@
 #define LV_USE_TILEVIEW   0
 #define LV_USE_WIN        0
 
+#define LV_FONT_MONTSERRAT_14 0
+#define LV_FONT_CUSTOM_DECLARE extern lv_font_t *lv_font_cubic_24;
+#define LV_FONT_DEFAULT lv_font_cubic_24
+
 #define LV_USE_FS_STDIO        1
 #define LV_FS_STDIO_LETTER     'S'
 #define LV_FS_STDIO_CACHE_SIZE 4096

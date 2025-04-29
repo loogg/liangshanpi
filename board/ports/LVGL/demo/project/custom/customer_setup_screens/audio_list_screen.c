@@ -4,7 +4,7 @@
 #include <poll.h>
 #include <unistd.h>
 
-#define PREFIX_PATH "/sdio"
+#define PREFIX_PATH "/sdio/Music"
 
 static lv_obj_t *_audio_back = NULL;
 
@@ -39,10 +39,13 @@ void audio_list_screen_custom_setup(lv_ui *ui) {
             dirent = readdir(dir);
             if (dirent == NULL) break;
 
-            if (strstr(dirent->d_name, ".wav")) {
+            size_t name_len = strlen(dirent->d_name);
+
+            if (memcmp(dirent->d_name + name_len - 4, ".wav", 4) == 0 || memcmp(dirent->d_name + name_len - 4, ".WAV", 4) == 0) {
                 lv_obj_t *wav_btn = lv_btn_create(ui->AudioList);
                 lv_obj_set_width(wav_btn, LV_PCT(100));
                 lv_label_set_text(lv_label_create(wav_btn), dirent->d_name);
+                lv_obj_set_width(lv_obj_get_child(wav_btn, 0), LV_PCT(100));
                 lv_obj_add_event_cb(wav_btn, _screen_btn_event_cb, LV_EVENT_ALL, ui);
             }
         } while (dirent != NULL);
@@ -51,6 +54,6 @@ void audio_list_screen_custom_setup(lv_ui *ui) {
 
     _audio_back = lv_btn_create(ui->AudioList);
     lv_obj_set_width(_audio_back, LV_PCT(100));
-    lv_label_set_text(lv_label_create(_audio_back), LV_SYMBOL_LEFT);
+    lv_label_set_text(lv_label_create(_audio_back), "返回");
     lv_obj_add_event_cb(_audio_back, _screen_btn_event_cb, LV_EVENT_ALL, ui);
 }
