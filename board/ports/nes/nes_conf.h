@@ -30,7 +30,7 @@
  * - 32: ARGB8888
  */
 #define NES_COLOR_DEPTH         (16)      /* color depth */
-#define NES_COLOR_SWAP          (1)       /* swap color channels */
+#define NES_COLOR_SWAP          (0)       /* swap color channels */
 #define NES_RAM_LACK            (0)       /* lack of RAM */
 
 #define NES_USE_FS              (1)       /* use file system */

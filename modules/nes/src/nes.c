@@ -362,7 +362,7 @@ void nes_run(nes_t* nes){
         }
         rt_tick_t t2 = rt_tick_get();
         rt_tick_t t_diff = t2 - t1;
-        rt_kprintf("t_diff:%u\n",t_diff);
+        // rt_kprintf("t_diff:%u\n",t_diff);
 #if (NES_RAM_LACK == 0)
         if((frame_cnt % (NES_FRAME_SKIP+1))==0){
             nes_draw(0, 0, NES_WIDTH-1, NES_HEIGHT-1, nes->nes_draw_data);

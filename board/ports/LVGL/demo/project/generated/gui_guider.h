@@ -22,6 +22,8 @@ typedef struct
 	bool Home_del;
 	lv_obj_t *AudioList;
 	bool AudioList_del;
+	lv_obj_t *GameList;
+	bool GameList_del;
 }lv_ui;
 
 typedef void (*ui_setup_scr_t)(lv_ui * ui);
@@ -47,6 +49,7 @@ extern lv_ui guider_ui;
 
 void setup_scr_Home(lv_ui *ui);
 void setup_scr_AudioList(lv_ui *ui);
+void setup_scr_GameList(lv_ui *ui);
 
 
 

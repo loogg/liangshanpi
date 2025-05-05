@@ -289,6 +289,43 @@
 			"visible": true,
 			"flag": [],
 			"list": [],
+			"event": {},
+			"style": [
+				{
+					"part": "LV_PART_MAIN",
+					"state": "LV_STATE_DEFAULT",
+					"disable": false,
+					"bg_color": "#ffffff",
+					"bg_grad_dir": "LV_GRAD_DIR_NONE",
+					"bg_dither_mode": "LV_DITHER_NONE",
+					"bg_main_stop": 0,
+					"bg_grad_stop": 255,
+					"bg_grad_color": "#2195f6",
+					"bg_opa": 0,
+					"bg_img_src": "",
+					"bg_img_opa": 255,
+					"bg_img_recolor": "#ffffff",
+					"bg_img_recolor_opa": 0
+				}
+			]
+		},
+		{
+			"name": "GameList",
+			"id": "zs4lyaly",
+			"type": "scr",
+			"version": 190,
+			"scrollbar_mode": "OFF",
+			"customer_code": {
+				"code_c": "game_list_screen_custom_setup(ui);",
+				"inc_c": "",
+				"code_py": "",
+				"inc_py": ""
+			},
+			"width": 240,
+			"height": 280,
+			"visible": true,
+			"flag": [],
+			"list": [],
 			"style": [
 				{
 					"part": "LV_PART_MAIN",
@@ -378,6 +415,47 @@
 				"scrollbar_mode": "OFF",
 				"customer_code": {
 					"code_c": "audio_list_screen_custom_setup(ui);",
+					"inc_c": "",
+					"code_py": "",
+					"inc_py": ""
+				},
+				"width": 240,
+				"height": 280,
+				"visible": true,
+				"flag": [],
+				"event": {},
+				"style": [
+					{
+						"part": "LV_PART_MAIN",
+						"state": "LV_STATE_DEFAULT",
+						"disable": false,
+						"bg_color": "#ffffff",
+						"bg_grad_dir": "LV_GRAD_DIR_NONE",
+						"bg_dither_mode": "LV_DITHER_NONE",
+						"bg_main_stop": 0,
+						"bg_grad_stop": 255,
+						"bg_grad_color": "#2195f6",
+						"bg_opa": 0,
+						"bg_img_src": "",
+						"bg_img_opa": 255,
+						"bg_img_recolor": "#ffffff",
+						"bg_img_recolor_opa": 0
+					}
+				],
+				"size": [
+					240,
+					280
+				],
+				"widgets": []
+			},
+			{
+				"name": "GameList",
+				"id": "zs4lyaly",
+				"type": "scr",
+				"version": 190,
+				"scrollbar_mode": "OFF",
+				"customer_code": {
+					"code_c": "game_list_screen_custom_setup(ui);",
 					"inc_c": "",
 					"code_py": "",
 					"inc_py": ""

@@ -13,6 +13,7 @@
 
 #include <lvgl.h>
 #include <rtthread.h>
+#include "lv_port.h"
 
 #define DBG_TAG    "LVGL"
 #define DBG_LVL    DBG_INFO
@@ -60,6 +61,10 @@ static void lvgl_thread_entry(void *parameter)
     while(1)
     {
         lv_task_handler();
+        if (disp_force_refresh) {
+            disp_force_refresh = 0;
+            lv_obj_invalidate(lv_scr_act());
+        }
         rt_thread_mdelay(LV_DISP_DEF_REFR_PERIOD);
     }
 }

@@ -14,8 +14,10 @@ extern "C" {
 #endif
 
 #include "gui_guider.h"
+#include "lv_port.h"
 #include "home_screen.h"
 #include "audio_list_screen.h"
+#include "game_list_screen.h"
 
 void custom_init(lv_ui *ui);
 

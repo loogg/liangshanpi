@@ -2,6 +2,7 @@
 
 
 static lv_obj_t *_music_btn = NULL;
+static lv_obj_t *_game_btn = NULL;
 
 static void _screen_btn_event_cb(lv_event_t *e) {
     lv_ui *ui = (lv_ui *)lv_event_get_user_data(e);
@@ -12,13 +13,20 @@ static void _screen_btn_event_cb(lv_event_t *e) {
 
     if (btn == _music_btn) {
         ui_load_scr_animation(ui, &ui->AudioList, ui->AudioList_del, &ui->Home_del, setup_scr_AudioList, LV_SCR_LOAD_ANIM_NONE, 0, 0, false, true);
+    } else if (btn == _game_btn) {
+        ui_load_scr_animation(ui, &ui->GameList, ui->GameList_del, &ui->Home_del, setup_scr_GameList, LV_SCR_LOAD_ANIM_NONE, 0, 0, false, true);
     }
 }
 
 void home_screen_custom_setup(lv_ui *ui) {
     _music_btn = lv_btn_create(ui->Home);
-    lv_obj_align(_music_btn, LV_ALIGN_CENTER, 0, 0);
+    lv_obj_align(_music_btn, LV_ALIGN_CENTER, -50, 0);
     lv_label_set_text(lv_label_create(_music_btn), "音乐");
 
+    _game_btn = lv_btn_create(ui->Home);
+    lv_obj_align(_game_btn, LV_ALIGN_CENTER, 50, 0);
+    lv_label_set_text(lv_label_create(_game_btn), "游戏");
+
     lv_obj_add_event_cb(_music_btn, _screen_btn_event_cb, LV_EVENT_ALL, ui);
+    lv_obj_add_event_cb(_game_btn, _screen_btn_event_cb, LV_EVENT_ALL, ui);
 }

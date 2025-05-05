@@ -18,6 +18,7 @@
 #ifndef BSP_USING_LVGL
 #include "drv_lcd_font.h"
 #endif /* BSP_USING_LVGL */
+#include "lvgl.h"
 #include <string.h>
 
 #define DBG_TAG    "drv.lcd"
@@ -51,6 +52,39 @@ static int rt_hw_lcd_config(void)
 
         rt_spi_configure(spi_dev_lcd, &cfg);
     }
+
+    return RT_EOK;
+}
+
+static int rt_hw_lcd_spi_change_data_width(struct stm32_spi *spi_drv, uint8_t data_width) {
+    struct rt_spi_configuration cfg = {0};
+
+    if (data_width == 8) {
+        spi_drv->dma.handle_rx.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
+        spi_drv->dma.handle_rx.Init.MemDataAlignment    = DMA_MDATAALIGN_BYTE;
+
+        spi_drv->dma.handle_tx.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
+        spi_drv->dma.handle_tx.Init.MemDataAlignment    = DMA_MDATAALIGN_BYTE;
+    } else if (data_width == 16) {
+        spi_drv->dma.handle_rx.Init.PeriphDataAlignment = DMA_PDATAALIGN_HALFWORD;
+        spi_drv->dma.handle_rx.Init.MemDataAlignment    = DMA_MDATAALIGN_HALFWORD;
+
+        spi_drv->dma.handle_tx.Init.PeriphDataAlignment = DMA_PDATAALIGN_HALFWORD;
+        spi_drv->dma.handle_tx.Init.MemDataAlignment    = DMA_MDATAALIGN_HALFWORD;
+    } else {
+        LOG_E("data_width %d is not supported", data_width);
+        return -RT_ERROR;
+    }
+
+    cfg.data_width = data_width;
+    cfg.mode = RT_SPI_MASTER | RT_SPI_MODE_0 | RT_SPI_MSB;
+#if defined(BSP_CPU_CLK_168MHZ)
+    cfg.max_hz = 42 * 1000 * 1000; /* 42M,SPI max 42MHz,lcd 4-wire spi */
+#elif defined(BSP_CPU_CLK_240MHZ)
+    cfg.max_hz = 60 * 1000 * 1000; /* 60M,SPI max 60MHz,lcd 4-wire spi */
+#endif
+
+    rt_spi_configure(spi_dev_lcd, &cfg);
 
     return RT_EOK;
 }
@@ -219,7 +253,7 @@ static int rt_hw_lcd_init(void)
 
     return RT_EOK;
 }
-// INIT_COMPONENT_EXPORT(rt_hw_lcd_init);
+INIT_COMPONENT_EXPORT(rt_hw_lcd_init);
 
 #ifndef BSP_USING_LVGL
 /**
@@ -473,15 +507,14 @@ void lcd_fill(rt_uint16_t x_start, rt_uint16_t y_start, rt_uint16_t x_end, rt_ui
 void lcd_fill_array(rt_uint16_t x_start, rt_uint16_t y_start, rt_uint16_t x_end, rt_uint16_t y_end, void *pcolor)
 {
     rt_uint32_t size = 0;
+    struct stm32_spi *spi_drv =  rt_container_of(spi_dev_lcd->bus, struct stm32_spi, spi_bus);
 
     size = (x_end - x_start + 1) * (y_end - y_start + 1) * 2/*16bit*/;
+    rt_pin_write(GET_PIN(A, 4), PIN_HIGH);
+    rt_hw_lcd_spi_change_data_width(spi_drv, 8);
     lcd_address_set(x_start, y_start, x_end, y_end);
     rt_pin_write(LCD_DC_PIN, PIN_HIGH);
     rt_spi_send(spi_dev_lcd, pcolor, size);
-}
-void lcd_fill_line_data(void *pcolor, int size) {
-    rt_pin_write(LCD_DC_PIN, PIN_HIGH);
-    rt_spi_send(spi_dev_lcd, pcolor, size * LCD_BYTES_PER_PIXEL);
 }
 
 #ifndef BSP_USING_LVGL
@@ -898,171 +931,18 @@ rt_err_t lcd_show_image(rt_uint16_t x, rt_uint16_t y, rt_uint16_t length, rt_uin
 
 #endif /* BSP_USING_LVGL */
 
-#define LCD_DEVICE(dev)     (struct drv_lcd_device*)(dev)
-
-struct drv_lcd_device
+void lcd_fill_array_async(rt_uint16_t x_start, rt_uint16_t y_start, rt_uint16_t x_end, rt_uint16_t y_end, void *pcolor)
 {
-    struct rt_device parent;
-
-    struct rt_device_graphic_info lcd_info;
-
-    uint32_t total_len;
-    uint32_t write_offset;
-
-    /* 0:front_buf is being used 1: back_buf is being used*/
-    rt_uint8_t cur_buf;
-    rt_uint8_t *lcd_frame_ptr;
-    rt_uint8_t *front_buf;
-    rt_uint8_t *back_buf;
-};
-
-static struct drv_lcd_device _lcd;
-
-static rt_err_t drv_lcd_init(struct rt_device *device)
-{
-    return RT_EOK;
-}
-
-void lcd_spi_dma_tx_cplt_callback(SPI_HandleTypeDef *hspi) {
-    struct drv_lcd_device *lcd = &_lcd;
-
-    if (lcd->total_len > lcd->write_offset) {
-        uint16_t trans_len = 0;
-        if (lcd->total_len - lcd->write_offset > UINT16_MAX) {
-            trans_len = UINT16_MAX;
-        } else {
-            trans_len = lcd->total_len - lcd->write_offset;
-        }
-
-        HAL_SPI_Transmit_DMA(hspi, lcd->lcd_frame_ptr + lcd->write_offset, trans_len);
-        lcd->write_offset += trans_len;
-    }
-}
-
-static rt_err_t drv_lcd_control(struct rt_device *device, int cmd, void *args) {
-    struct drv_lcd_device *lcd = LCD_DEVICE(device);
-    struct rt_device_rect_info *rect_info = RT_NULL;
-
     struct stm32_spi *spi_drv =  rt_container_of(spi_dev_lcd->bus, struct stm32_spi, spi_bus);
     SPI_HandleTypeDef *spi_handle = &spi_drv->handle;
 
-    switch (cmd) {
-        case RTGRAPHIC_CTRL_RECT_UPDATE: {
-            /* update */
-            rect_info = (struct rt_device_rect_info *)args;
-            rt_pin_write(GET_PIN(A, 4), PIN_HIGH);
-            lcd_address_set(0, 0, 240 - 1, 240 - 1);
-            rt_pin_write(LCD_DC_PIN, PIN_HIGH);
-            rt_pin_write(GET_PIN(A, 4), PIN_LOW);
-            lcd->total_len = rect_info->width * rect_info->height * LCD_BYTES_PER_PIXEL;
-            lcd->write_offset = 0;
-            lcd->lcd_frame_ptr = lcd->lcd_info.framebuffer;
+    rt_pin_write(GET_PIN(A, 4), PIN_HIGH);
+    rt_hw_lcd_spi_change_data_width(spi_drv, 8);
+    lcd_address_set(x_start, y_start, x_end, y_end);
+    rt_pin_write(LCD_DC_PIN, PIN_HIGH);
+    rt_hw_lcd_spi_change_data_width(spi_drv, 16);
+    rt_pin_write(GET_PIN(A, 4), PIN_LOW);
+    uint32_t _lcd_dma_total_len = (x_end - x_start + 1) * (y_end - y_start + 1);
 
-            if (lcd->total_len > lcd->write_offset) {
-                uint16_t trans_len = 0;
-                if (lcd->total_len - lcd->write_offset > UINT16_MAX) {
-                    trans_len = UINT16_MAX;
-                } else {
-                    trans_len = lcd->total_len - lcd->write_offset;
-                }
-
-                HAL_SPI_Transmit_DMA(spi_handle, lcd->lcd_frame_ptr + lcd->write_offset, trans_len);
-                lcd->write_offset += trans_len;
-            }
-        } break;
-
-        case RTGRAPHIC_CTRL_GET_INFO: {
-            struct rt_device_graphic_info *info = (struct rt_device_graphic_info *)args;
-
-            RT_ASSERT(info != RT_NULL);
-            info->pixel_format = lcd->lcd_info.pixel_format;
-            info->bits_per_pixel = lcd->lcd_info.bits_per_pixel;
-            info->width = lcd->lcd_info.width;
-            info->height = lcd->lcd_info.height;
-            if (lcd->cur_buf) {
-                lcd->lcd_info.framebuffer = lcd->front_buf;
-                lcd->cur_buf = 0;
-            } else {
-                lcd->lcd_info.framebuffer = lcd->back_buf;
-                lcd->cur_buf = 1;
-            }
-            info->framebuffer = lcd->lcd_info.framebuffer;
-        } break;
-
-        default:
-            break;
-    }
-
-    return RT_EOK;
+    HAL_SPI_Transmit_DMA(spi_handle, pcolor, _lcd_dma_total_len);
 }
-
-#ifdef RT_USING_DEVICE_OPS
-const static struct rt_device_ops lcd_ops =
-{
-    drv_lcd_init,
-    RT_NULL,
-    RT_NULL,
-    RT_NULL,
-    RT_NULL,
-    drv_lcd_control
-};
-#endif
-
-int drv_lcd_st7789_hw_init(void)
-{
-    rt_err_t result = RT_EOK;
-    struct rt_device *device = &_lcd.parent;
-
-    /* memset _lcd to zero */
-    memset(&_lcd, 0x00, sizeof(_lcd));
-
-    /* config LCD dev info */
-    _lcd.lcd_info.height = LCD_H;
-    _lcd.lcd_info.width = LCD_W;
-    _lcd.lcd_info.bits_per_pixel = LCD_BITS_PER_PIXEL;
-    _lcd.lcd_info.pixel_format = LCD_PIXEL_FORMAT;
-
-    /* malloc memory for double Buffering */
-    _lcd.front_buf = rt_malloc(LCD_BUF_SIZE);
-    _lcd.back_buf = rt_malloc(LCD_BUF_SIZE);
-    if (_lcd.front_buf == RT_NULL || _lcd.back_buf == RT_NULL)
-    {
-        LOG_E("init frame buffer failed!\n");
-        result = -RT_ENOMEM;
-        goto __exit;
-    }
-
-    /* memset buff to 0xFF */
-    memset(_lcd.front_buf, 0xFF, LCD_BUF_SIZE);
-    memset(_lcd.back_buf, 0xFF, LCD_BUF_SIZE);
-
-    device->type    = RT_Device_Class_Graphic;
-#ifdef RT_USING_DEVICE_OPS
-    device->ops     = &lcd_ops;
-#else
-    device->init    = drv_lcd_init;
-    device->control = drv_lcd_control;
-#endif
-
-    /* register lcd device */
-    rt_device_register(device, "lcd", RT_DEVICE_FLAG_RDWR);
-
-    /* init spi lcd */
-    rt_hw_lcd_init();
-
-__exit:
-    if (result != RT_EOK)
-    {
-        if (_lcd.back_buf)
-        {
-            rt_free(_lcd.back_buf);
-        }
-
-        if (_lcd.front_buf)
-        {
-            rt_free(_lcd.front_buf);
-        }
-    }
-    return result;
-}
-INIT_COMPONENT_EXPORT(drv_lcd_st7789_hw_init);

@@ -92,7 +92,7 @@ static void nes_thread_entry(void* parameter) {
 static void nes_thread_entry(void* parameter) {
     const char* nes_file_path = (const char*)parameter;
 
-    nes_load(nes_file_path);
+    nes_load((uint8_t *)nes_file_path);
 }
 #endif
 

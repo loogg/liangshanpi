@@ -13,6 +13,7 @@
 #include <board.h>
 #include <drv_lcd.h>
 #include "usbh_standard_hid.h"
+#include "nesplayer.h"
 
 lv_indev_t *touch_indev;
 lv_indev_t *enc_indev;
@@ -23,6 +24,8 @@ static rt_int16_t last_y = 0;
 
 static int16_t enc_diff = 0;
 static lv_indev_state_t enc_state = LV_INDEV_STATE_REL;
+
+static lv_indev_state_t last_right_state = LV_INDEV_STATE_REL;
 
 static void input_read(lv_indev_drv_t *indev_drv, lv_indev_data_t *data)
 {
@@ -56,6 +59,12 @@ void usr_mouse_process_data (mouse_report_data *data) {
 
     enc_diff = data->wheel;
     enc_state = data->buttons[2] ? LV_INDEV_STATE_PR : LV_INDEV_STATE_REL;
+
+    if (last_right_state == LV_INDEV_STATE_PR && data->buttons[1] == 0) {
+        nesplayer_stop();
+    }
+
+    last_right_state = data->buttons[1] ? LV_INDEV_STATE_PR : LV_INDEV_STATE_REL;
 }
 
 void lv_port_indev_init(void)

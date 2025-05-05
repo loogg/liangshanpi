@@ -22,13 +22,32 @@ static lv_disp_drv_t disp_drv;
 /*Static or global buffer(s). The second buffer is optional*/
 static lv_color_t buf_1[MY_DISP_HOR_RES * DISP_BUFFER_LINES];
 
+static volatile bool disp_flush_enabled = true;
+uint8_t disp_force_refresh = 0;
+
+/* Enable updating the screen (the flushing process) when disp_flush() is called by LVGL
+ */
+void disp_enable_update(void)
+{
+    disp_flush_enabled = true;
+    disp_force_refresh = 1;
+}
+
+/* Disable updating the screen (the flushing process) when disp_flush() is called by LVGL
+ */
+void disp_disable_update(void)
+{
+    disp_flush_enabled = false;
+}
+
 /*Flush the content of the internal buffer the specific area on the display
  *You can use DMA or any hardware acceleration to do this operation in the background but
  *'lv_disp_flush_ready()' has to be called when finished.*/
 static void disp_flush(lv_disp_drv_t * disp_drv, const lv_area_t * area, lv_color_t * color_p)
 {
     /* color_p is a buffer pointer; the buffer is provided by LVGL */
-    lcd_fill_array(area->x1, area->y1, area->x2, area->y2, color_p);
+    if (disp_flush_enabled)
+        lcd_fill_array(area->x1, area->y1, area->x2, area->y2, color_p);
 
     /*IMPORTANT!!!
      *Inform the graphics library that you are ready with the flushing*/

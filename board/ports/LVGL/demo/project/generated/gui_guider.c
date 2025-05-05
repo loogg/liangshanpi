@@ -77,6 +77,7 @@ void init_scr_del_flag(lv_ui *ui)
 
     ui->Home_del = true;
     ui->AudioList_del = true;
+    ui->GameList_del = true;
 }
 
 void setup_ui(lv_ui *ui)
