@@ -1043,6 +1043,10 @@ void HAL_SPI_TxCpltCallback(SPI_HandleTypeDef *hspi)
 {
     struct stm32_spi *spi_drv =  rt_container_of(hspi, struct stm32_spi, handle);
     rt_completion_done(&spi_drv->cpt);
+
+    if (spi_drv->spi_bus.owner->parent.tx_complete) {
+        spi_drv->spi_bus.owner->parent.tx_complete((rt_device_t)spi_drv->spi_bus.owner, NULL);
+    }
 }
 
 void HAL_SPI_RxCpltCallback(SPI_HandleTypeDef *hspi)

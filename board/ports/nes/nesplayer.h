@@ -5,7 +5,14 @@
 extern "C" {
 #endif
 
+#include <rtthread.h>
+#ifdef BSP_USING_NES_C
 #include "nes.h"
+#endif
+
+#ifdef BSP_USING_NES_OPENEDV
+#include "nes_main.h"
+#endif
 
 int nesplayer_play(char *uri);
 int nesplayer_stop(void);

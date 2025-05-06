@@ -11,6 +11,7 @@ extern uint8_t disp_force_refresh;
 
 void disp_enable_update(void);
 void disp_disable_update(void);
+void disp_ex_flush_ready(void);
 
 #ifdef __cplusplus
 }

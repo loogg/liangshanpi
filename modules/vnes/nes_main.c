@@ -61,6 +61,7 @@ MapperCommRes *MAPx;
 uint8_t *spr_ram;       /* 精灵RAM,256字节 */
 ppu_data *ppu;          /* ppu指针 */
 uint8_t *VROM_banks;
+uint8_t vrom_banks_alloc_flag = 0;
 uint8_t *VROM_tiles;
 
 apu_t *apu;             /* apu指针 */
@@ -71,8 +72,6 @@ uint8_t *romfile;       /* nes文件指针,指向整个nes文件的起始地址 */
 #define SOUND_DEVICE_NAME   "sound0"
 
 static rt_device_t _sound_device = RT_NULL;
-static rt_device_t _lcd_device = RT_NULL;
-rt_mailbox_t key_mb = RT_NULL;
 
 /**
  * @brief       加载ROM
@@ -99,6 +98,7 @@ uint8_t nes_load_rom(void)
 
         if (RomHeader->num_8k_vrom_banks > 0)   /* 存在VROM,进行预解码 */
         {
+            vrom_banks_alloc_flag = 0;
             VROM_banks = p + 16 + (RomHeader->num_16k_rom_banks * 0x4000);
 #if	NES_RAM_SPEED == 1    /* 1:内存占用小 0:速度快 */
             VROM_tiles=VROM_banks;
@@ -112,6 +112,7 @@ uint8_t nes_load_rom(void)
         }
         else
         {
+            vrom_banks_alloc_flag = 1;
             VROM_banks = mymalloc(SRAMIN,8 * 1024);
             VROM_tiles = mymalloc(SRAMEX,8 * 1024);
 
@@ -174,7 +175,7 @@ uint8_t nes_load_rom(void)
  */
 void nes_sram_free(void)
 {
-    myfree(SRAMIN,NES_RAM);
+    rt_free_align(NES_RAM);
     myfree(SRAMIN,NES_SRAM);
     myfree(SRAMIN,RomHeader);
     myfree(SRAMIN,NES_Mapper);
@@ -186,7 +187,9 @@ void nes_sram_free(void)
 
     if ((VROM_tiles != VROM_banks) && VROM_banks && VROM_tiles)/* 如果分别为VROM_banks和VROM_tiles申请了内存,则释放 */
     {
-        myfree(SRAMIN,VROM_banks);
+        if (vrom_banks_alloc_flag) {
+            myfree(SRAMIN,VROM_banks);
+        }
         myfree(SRAMEX,VROM_tiles);
     }
 
@@ -225,6 +228,7 @@ void nes_sram_free(void)
     wave_buffers = 0;
     romfile = 0;
     VROM_banks = 0;
+    vrom_banks_alloc_flag = 0;
     VROM_tiles = 0;
     MAP1 = 0;
     MAPx = 0;
@@ -301,10 +305,6 @@ uint8_t nes_load(uint8_t* pname)
 
     uint8_t res = 0;
 
-    if (key_mb == RT_NULL) {
-        key_mb = rt_mb_create("key_mb", 32, RT_IPC_FLAG_FIFO);
-    }
-
     buf = mymalloc(SRAMIN, 1024);
 
     if (stat((char *)pname, &s) != 0) /* 获取文件大小 */
@@ -346,14 +346,9 @@ uint8_t nes_load(uint8_t* pname)
             Mapper_Init();                          /* map初始化 */
             PPU_reset();                            /* ppu复位 */
             apu_init();                             /* apu初始化  */
-            _lcd_device = rt_device_find("lcd");
-            rt_device_open(_lcd_device, RT_DEVICE_OFLAG_WRONLY);
             nes_sound_open(0,APU_SAMPLE_RATE);      /* 初始化播放设备 */
+            system_task_return = 0;
             nes_emulate_frame();                    /* 进入NES模拟器主循环 */
-            if (_lcd_device != RT_NULL) {
-                rt_device_close(_lcd_device);
-                _lcd_device = RT_NULL;
-            }
             nes_sound_close();                      /* 关闭声音输出 */
         }
     }
@@ -370,25 +365,9 @@ uint16_t nes_yoff = 0;                              /* 显示在y轴方向的偏移量 */
 uint16_t *lcd_frame_ptr = NULL;
 uint32_t lcd_frame_write_index = 0; /* LCD显示数据写入索引 */
 
-static int _lcd_get_framebuffer(void) {
-    struct rt_device_graphic_info info;
-    rt_device_control(_lcd_device, RTGRAPHIC_CTRL_GET_INFO, &info);
-    lcd_frame_ptr = info.framebuffer;
-    lcd_frame_write_index = 0;
+int nes_get_framebuffer(void);
+int nes_frame_draw(void);
 
-    return 0;
-}
-
-int _lcd_frame_draw(void) {
-    struct rt_device_rect_info rect_info;
-    rect_info.x = 0;
-    rect_info.y = 0;
-    rect_info.width = 240;
-    rect_info.height = 240;
-
-    rt_device_control(_lcd_device, RTGRAPHIC_CTRL_RECT_UPDATE, &rect_info);
-    return 0;
-}
 
 /**
  * @brief       设置游戏显示窗口
@@ -408,163 +387,6 @@ void nes_set_window(void)
 }
 
 
-typedef union {
-    struct {
-        uint16_t A1:1;
-        uint16_t B1:1;
-        uint16_t SE1:1;
-        uint16_t ST1:1;
-        uint16_t U1:1;
-        uint16_t D1:1;
-        uint16_t L1:1;
-        uint16_t R1:1;
-
-        uint16_t A2:1;
-        uint16_t B2:1;
-        uint16_t SE2:1;
-        uint16_t ST2:1;
-        uint16_t U2:1;
-        uint16_t D2:1;
-        uint16_t L2:1;
-        uint16_t R2:1;
-    };
-    uint16_t joypad;
-} nes_joypad_t;
-
-/**
- * @brief       读取游戏手柄数据
- * @param       无
- * @retval      无
- */
-void nes_get_gamepadval(void)
-{
-    static nes_joypad_t joypad = {0};
-
-    rt_uint32_t key_data = 0;
-    if (rt_mb_recv(key_mb, &key_data, RT_WAITING_NO) == RT_EOK) {
-        switch (key_data & 0xff00) {
-            case 0x0100:
-                switch (key_data & 0xff){
-                    case 26://W
-                        joypad.U1 = 1;
-                        break;
-                    case 22://S
-                        joypad.D1 = 1;
-                        break;
-                    case 4://A
-                        joypad.L1 = 1;
-                        break;
-                    case 7://D
-                        joypad.R1 = 1;
-                        break;
-                    case 13://J
-                        joypad.A1 = 1;
-                        break;
-                    case 14://K
-                        joypad.B1 = 1;
-                        break;
-                    case 25://V
-                        joypad.SE1 = 1;
-                        break;
-                    case 5://B
-                        joypad.ST1 = 1;
-                        break;
-                    case 82://↑
-                        joypad.U2 = 1;
-                        break;
-                    case 81://↓
-                        joypad.D2 = 1;
-                        break;
-                    case 80://←
-                        joypad.L2 = 1;
-                        break;
-                    case 79://→
-                        joypad.R2 = 1;
-                        break;
-                    case 93://5
-                        joypad.A2 = 1;
-                        break;
-                    case 94://6
-                        joypad.B2 = 1;
-                        break;
-                    case 89://1
-                        joypad.SE2 = 1;
-                        break;
-                    case 90://2
-                        joypad.ST2 = 1;
-                        break;
-                    default:
-                        break;
-                    }
-                break;
-            case 0x0000:
-                switch (key_data & 0xff){
-                    case 26://W
-                        joypad.U1 = 0;
-                        break;
-                    case 22://S
-                        joypad.D1 = 0;
-                        break;
-                    case 4://A
-                        joypad.L1 = 0;
-                        break;
-                    case 7://D
-                        joypad.R1 = 0;
-                        break;
-                    case 13://J
-                        joypad.A1 = 0;
-                        break;
-                    case 14://K
-                        joypad.B1 = 0;
-                        break;
-                    case 25://V
-                        joypad.SE1 = 0;
-                        break;
-                    case 5://B
-                        joypad.ST1 = 0;
-                        break;
-                    case 82://↑
-                        joypad.U2 = 0;
-                        break;
-                    case 81://↓
-                        joypad.D2 = 0;
-                        break;
-                    case 80://←
-                        joypad.L2 = 0;
-                        break;
-                    case 79://→
-                        joypad.R2 = 0;
-                        break;
-                    case 93://5
-                        joypad.A2 = 0;
-                        break;
-                    case 94://6
-                        joypad.B2 = 0;
-                        break;
-                    case 89://1
-                        joypad.SE2 = 0;
-                        break;
-                    case 90://2
-                        joypad.ST2 = 0;
-                        break;
-
-                    case 41://ESC
-                        system_task_return = 1;
-                        break;
-                    default:
-                        break;
-                    }
-                break;
-
-            default:
-                break;
-        }
-    }
-
-    PADdata0 = joypad.joypad; /* 手柄1 */
-    PADdata1 = joypad.joypad >> 8; /* 手柄2 */
-}
-
 /**
  * @brief       nes模拟器主循环
  * @param       无
@@ -583,7 +405,7 @@ void nes_emulate_frame(void)
         PPU_start_frame();
 
         if (nes_frame == 0) {
-            _lcd_get_framebuffer(); /* 获取LCD显示缓存 */
+            nes_get_framebuffer(); /* 获取LCD显示缓存 */
         }
 
         rt_tick_t t1 = rt_tick_get();
@@ -597,10 +419,10 @@ void nes_emulate_frame(void)
         }
         rt_tick_t t2 = rt_tick_get();
         rt_tick_t t_diff = t2 - t1;
-        rt_kprintf("nes frame time:%u\r\n", t_diff);
+        // rt_kprintf("nes frame time:%u\r\n", t_diff);
 
         if (nes_frame == 0) {
-            _lcd_frame_draw(); /* 刷新LCD显示缓存 */
+            nes_frame_draw(); /* 刷新LCD显示缓存 */
         }
 
         NES_scanline = 240;
@@ -632,7 +454,7 @@ void nes_emulate_frame(void)
 
         if (system_task_return)
         {
-            printf("nes exit\r\n");
+            break;
         }
 
         nes_set_window();               /* 设置窗口 */

@@ -45,7 +45,11 @@ typedef struct _nesplayer {
 } nesplayer_t;
 
 static nesplayer_t _player = {0};
+static uint16_t *_lcd_frame_buf1 = RT_NULL;
+static uint16_t *_lcd_frame_buf2 = RT_NULL;
+static uint16_t *_lcd_framebuffer = RT_NULL;
 
+#ifdef BSP_USING_NES_C
 /* memory */
 void *nes_malloc(int num){
     return rt_malloc(num);
@@ -89,7 +93,6 @@ int nes_fclose(FILE *stream ){
     return fclose(stream);
 }
 #endif
-
 
 static void update_joypad(nes_t *nes)
 {
@@ -263,10 +266,6 @@ int nes_deinitex(nes_t *nes){
     return 0;
 }
 
-static uint16_t *_lcd_frame_buf1 = RT_NULL;
-static uint16_t *_lcd_frame_buf2 = RT_NULL;
-static uint16_t *_lcd_framebuffer = RT_NULL;
-
 int nes_get_framebuffer(nes_t *nes) {
     if (_lcd_framebuffer == _lcd_frame_buf1) {
         _lcd_framebuffer = _lcd_frame_buf2;
@@ -302,6 +301,211 @@ void nes_frame(nes_t* nes){
     update_joypad(nes);
     rt_thread_mdelay(1);
 }
+#endif /* BSP_USING_NES_C */
+
+#ifdef BSP_USING_NES_OPENEDV
+
+extern uint16_t *lcd_frame_ptr;
+extern uint32_t lcd_frame_write_index;
+
+int nes_get_framebuffer(void) {
+    if (_lcd_framebuffer == _lcd_frame_buf1) {
+        _lcd_framebuffer = _lcd_frame_buf2;
+    } else {
+        _lcd_framebuffer = _lcd_frame_buf1;
+    }
+
+    lcd_frame_ptr = _lcd_framebuffer;
+    lcd_frame_write_index = 0;
+
+    return 0;
+}
+
+int nes_frame_draw(void) {
+    uint16_t x1 = 0;
+    uint16_t y1 = 0;
+    uint16_t x2 = 240 - 1;
+    uint16_t y2 = 240 - 1;
+
+    lcd_fill_array_async(x1, y1 + 10, x2, y2 + 10, _lcd_framebuffer);
+    return 0;
+}
+
+extern uint8_t PADdata0;
+extern uint8_t PADdata1;
+extern volatile uint8_t system_task_return;
+
+typedef union {
+    struct {
+        uint16_t A1:1;
+        uint16_t B1:1;
+        uint16_t SE1:1;
+        uint16_t ST1:1;
+        uint16_t U1:1;
+        uint16_t D1:1;
+        uint16_t L1:1;
+        uint16_t R1:1;
+
+        uint16_t A2:1;
+        uint16_t B2:1;
+        uint16_t SE2:1;
+        uint16_t ST2:1;
+        uint16_t U2:1;
+        uint16_t D2:1;
+        uint16_t L2:1;
+        uint16_t R2:1;
+    };
+    uint16_t joypad;
+} nes_joypad_t;
+
+static nes_joypad_t joypad = {0};
+
+/**
+ * @brief       读取游戏手柄数据
+ * @param       无
+ * @retval      无
+ */
+void nes_get_gamepadval(void)
+{
+    rt_uint32_t mb_data = 0;
+    rt_uint32_t key_data = 0;
+
+    if (rt_mb_recv(_player.play_mb, &mb_data, RT_WAITING_NO) == RT_EOK) {
+        switch (mb_data) {
+            case NESPLAYER_MSG_STOP: {
+                system_task_return = 1;
+            } break;
+
+            default:
+                break;
+        }
+    }
+
+    if (rt_mb_recv(_player.key_mb, &key_data, RT_WAITING_NO) == RT_EOK) {
+        switch (key_data & 0xff00) {
+            case 0x0100:
+                switch (key_data & 0xff){
+                    case 26://W
+                        joypad.U1 = 1;
+                        break;
+                    case 22://S
+                        joypad.D1 = 1;
+                        break;
+                    case 4://A
+                        joypad.L1 = 1;
+                        break;
+                    case 7://D
+                        joypad.R1 = 1;
+                        break;
+                    case 13://J
+                        joypad.A1 = 1;
+                        break;
+                    case 14://K
+                        joypad.B1 = 1;
+                        break;
+                    case 25://V
+                        joypad.SE1 = 1;
+                        break;
+                    case 5://B
+                        joypad.ST1 = 1;
+                        break;
+                    case 82://↑
+                        joypad.U2 = 1;
+                        break;
+                    case 81://↓
+                        joypad.D2 = 1;
+                        break;
+                    case 80://←
+                        joypad.L2 = 1;
+                        break;
+                    case 79://→
+                        joypad.R2 = 1;
+                        break;
+                    case 93://5
+                        joypad.A2 = 1;
+                        break;
+                    case 94://6
+                        joypad.B2 = 1;
+                        break;
+                    case 89://1
+                        joypad.SE2 = 1;
+                        break;
+                    case 90://2
+                        joypad.ST2 = 1;
+                        break;
+                    default:
+                        break;
+                    }
+                break;
+            case 0x0000:
+                switch (key_data & 0xff){
+                    case 26://W
+                        joypad.U1 = 0;
+                        break;
+                    case 22://S
+                        joypad.D1 = 0;
+                        break;
+                    case 4://A
+                        joypad.L1 = 0;
+                        break;
+                    case 7://D
+                        joypad.R1 = 0;
+                        break;
+                    case 13://J
+                        joypad.A1 = 0;
+                        break;
+                    case 14://K
+                        joypad.B1 = 0;
+                        break;
+                    case 25://V
+                        joypad.SE1 = 0;
+                        break;
+                    case 5://B
+                        joypad.ST1 = 0;
+                        break;
+                    case 82://↑
+                        joypad.U2 = 0;
+                        break;
+                    case 81://↓
+                        joypad.D2 = 0;
+                        break;
+                    case 80://←
+                        joypad.L2 = 0;
+                        break;
+                    case 79://→
+                        joypad.R2 = 0;
+                        break;
+                    case 93://5
+                        joypad.A2 = 0;
+                        break;
+                    case 94://6
+                        joypad.B2 = 0;
+                        break;
+                    case 89://1
+                        joypad.SE2 = 0;
+                        break;
+                    case 90://2
+                        joypad.ST2 = 0;
+                        break;
+
+                    case 41://ESC
+                        system_task_return = 1;
+                        break;
+                    default:
+                        break;
+                    }
+                break;
+
+            default:
+                break;
+        }
+    }
+
+    PADdata0 = joypad.joypad; /* 手柄1 */
+    PADdata1 = joypad.joypad >> 8; /* 手柄2 */
+}
+
+#endif /* BSP_USING_NES_OPENEDV */
 
 int nesplayer_play(char *uri) {
     if (_player.state != NESPLAYER_STATE_STOPPED) {
@@ -344,6 +548,7 @@ static void nesplayer_entry(void* parameter) {
         rt_mb_control(_player.key_mb, RT_IPC_CMD_RESET, RT_NULL);
         _player.state = NESPLAYER_STATE_PLAYING;
 
+#ifdef BSP_USING_NES_C
         nes_t *nes = nes_init();
         do {
             int ret = nes_load_file(nes, _player.uri);
@@ -356,6 +561,12 @@ static void nesplayer_entry(void* parameter) {
             nes_unload_file(nes);
         } while (0);
         nes_deinit(nes);
+#endif /* BSP_USING_NES_C */
+
+#ifdef BSP_USING_NES_OPENEDV
+        rt_memset(&joypad, 0, sizeof(nes_joypad_t));
+        nes_load((uint8_t *)_player.uri);
+#endif /* BSP_USING_NES_OPENEDV */
 
         _player.state = NESPLAYER_STATE_STOPPED;
         disp_enable_update();

@@ -21,6 +21,8 @@
     extern "C" {
 #endif
 
+#ifdef BSP_USING_NES_C
+
 #define NES_ENABLE_SOUND        (1)       /* enable sound */
 #define NES_USE_SRAM            (1)       /* use SRAM */
 
@@ -45,6 +47,8 @@
 
 /* log */
 #define nes_log_printf(format,...)  printf(format, ##__VA_ARGS__)
+
+#endif /* BSP_USING_NES_C */
 
 #ifdef __cplusplus
     }

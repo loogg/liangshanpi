@@ -18,7 +18,7 @@
 #ifndef BSP_USING_LVGL
 #include "drv_lcd_font.h"
 #endif /* BSP_USING_LVGL */
-#include "lvgl.h"
+#include "lv_port.h"
 #include <string.h>
 
 #define DBG_TAG    "drv.lcd"
@@ -32,6 +32,8 @@
 #define LCD_CLEAR_SEND_NUMBER 5760 /* 240*240/10 */
 rt_uint16_t BACK_COLOR = WHITE, FORE_COLOR = BLACK;
 #endif /* BSP_USING_LVGL */
+
+static rt_err_t _async_done(rt_device_t dev, void *buffer);
 
 static struct rt_spi_device *spi_dev_lcd;
 
@@ -52,6 +54,8 @@ static int rt_hw_lcd_config(void)
 
         rt_spi_configure(spi_dev_lcd, &cfg);
     }
+
+    rt_device_set_tx_complete((rt_device_t)spi_dev_lcd, _async_done);
 
     return RT_EOK;
 }
@@ -931,18 +935,30 @@ rt_err_t lcd_show_image(rt_uint16_t x, rt_uint16_t y, rt_uint16_t length, rt_uin
 
 #endif /* BSP_USING_LVGL */
 
+uint32_t _lcd_dma_total_len = 0;
+
+static rt_err_t _async_done(rt_device_t dev, void *buffer) {
+    if (_lcd_dma_total_len) {
+        _lcd_dma_total_len = 0;
+        disp_ex_flush_ready();
+    }
+
+    return RT_EOK;
+}
+
 void lcd_fill_array_async(rt_uint16_t x_start, rt_uint16_t y_start, rt_uint16_t x_end, rt_uint16_t y_end, void *pcolor)
 {
     struct stm32_spi *spi_drv =  rt_container_of(spi_dev_lcd->bus, struct stm32_spi, spi_bus);
     SPI_HandleTypeDef *spi_handle = &spi_drv->handle;
 
+    _lcd_dma_total_len = 0;
     rt_pin_write(GET_PIN(A, 4), PIN_HIGH);
     rt_hw_lcd_spi_change_data_width(spi_drv, 8);
     lcd_address_set(x_start, y_start, x_end, y_end);
     rt_pin_write(LCD_DC_PIN, PIN_HIGH);
     rt_hw_lcd_spi_change_data_width(spi_drv, 16);
     rt_pin_write(GET_PIN(A, 4), PIN_LOW);
-    uint32_t _lcd_dma_total_len = (x_end - x_start + 1) * (y_end - y_start + 1);
+    _lcd_dma_total_len = (x_end - x_start + 1) * (y_end - y_start + 1);
 
     HAL_SPI_Transmit_DMA(spi_handle, pcolor, _lcd_dma_total_len);
 }
