@@ -39,7 +39,7 @@
 #define  FALSE    0
 #endif
 
-#define NES_COLOR_SWAP 1
+#define NES_COLOR_SWAP 0
 
 static const unsigned int NES_Palette[64] =
 {

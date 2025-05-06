@@ -75,6 +75,7 @@ void lv_port_disp_init(void)
     /*Used to copy the buffer's content to the display*/
     disp_drv.flush_cb = disp_flush;
 
+
     /*Finally register the driver*/
     lv_disp_drv_register(&disp_drv);
 }

@@ -936,11 +936,26 @@ rt_err_t lcd_show_image(rt_uint16_t x, rt_uint16_t y, rt_uint16_t length, rt_uin
 #endif /* BSP_USING_LVGL */
 
 uint32_t _lcd_dma_total_len = 0;
+uint32_t _lcd_dma_write_index = 0;
+uint16_t *_lcd_pcolor = RT_NULL;
 
 static rt_err_t _async_done(rt_device_t dev, void *buffer) {
+    struct stm32_spi *spi_drv =  rt_container_of(spi_dev_lcd->bus, struct stm32_spi, spi_bus);
+    SPI_HandleTypeDef *spi_handle = &spi_drv->handle;
+
     if (_lcd_dma_total_len) {
-        _lcd_dma_total_len = 0;
-        disp_ex_flush_ready();
+        if (_lcd_dma_total_len > _lcd_dma_write_index) {
+            uint32_t send_len = _lcd_dma_total_len - _lcd_dma_write_index;
+            if (send_len > 65535) {
+                send_len = 65535;
+            }
+
+            HAL_SPI_Transmit_DMA(spi_handle, (void *)(_lcd_pcolor + _lcd_dma_write_index), send_len);
+            _lcd_dma_write_index += send_len;
+        } else {
+            _lcd_dma_total_len = 0;
+            disp_ex_flush_ready();
+        }
     }
 
     return RT_EOK;
@@ -959,6 +974,14 @@ void lcd_fill_array_async(rt_uint16_t x_start, rt_uint16_t y_start, rt_uint16_t 
     rt_hw_lcd_spi_change_data_width(spi_drv, 16);
     rt_pin_write(GET_PIN(A, 4), PIN_LOW);
     _lcd_dma_total_len = (x_end - x_start + 1) * (y_end - y_start + 1);
+    _lcd_dma_write_index = 0;
+    _lcd_pcolor = (uint16_t *)pcolor;
 
-    HAL_SPI_Transmit_DMA(spi_handle, pcolor, _lcd_dma_total_len);
+    uint32_t send_len = _lcd_dma_total_len - _lcd_dma_write_index;
+    if (send_len > 65535) {
+        send_len = 65535;
+    }
+
+    HAL_SPI_Transmit_DMA(spi_handle, (void *)(_lcd_pcolor + _lcd_dma_write_index), send_len);
+    _lcd_dma_write_index += send_len;
 }
