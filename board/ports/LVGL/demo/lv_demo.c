@@ -19,7 +19,7 @@
 #define DBG_LVL DBG_INFO
 #include <rtdbg.h>
 
-#define TTF_PATH "sdio/Cubic_11.ttf"
+#define TTF_PATH "sdio/爱点风雅黑.ttf"
 
 extern int sdcard_check_mount(void);
 

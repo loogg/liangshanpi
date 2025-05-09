@@ -12,15 +12,14 @@
 #include <board.h>
 #include <rtthread.h>
 #include <drv_gpio.h>
-#ifndef RT_USING_NANO
 #include <rtdevice.h>
-#endif /* RT_USING_NANO */
-
 #include <dfs_romfs.h>
 #include <dfs_fs.h>
 #include <dfs_file.h>
 #include <poll.h>
 #include <unistd.h>
+#include "lv_port.h"
+#include "nesplayer.h"
 
 #define DBG_TAG    "main"
 #define DBG_LVL    DBG_INFO
@@ -60,3 +59,28 @@ void show_all_clk(void) {
     rt_kprintf("HAL_RCC_GetPCLK2Freq:%d\n", HAL_RCC_GetPCLK2Freq());
 }
 MSH_CMD_EXPORT(show_all_clk, show all clock frequency);
+
+static int nes_start(int argc, char* argv[]) {
+    static char nes_file_path[256];
+    if (argc == 2) {
+        snprintf(nes_file_path, sizeof(nes_file_path), "%s", argv[1]);
+        size_t nes_file_path_len = strlen(nes_file_path);
+        if (memcmp(nes_file_path+nes_file_path_len-4,".nes",4)==0 || memcmp(nes_file_path+nes_file_path_len-4,".NES",4)==0){
+            rt_kprintf("nes_file_path:%s\n",nes_file_path);
+
+            nesplayer_stop();
+            rt_thread_mdelay(300);
+            disp_disable_update();
+            nesplayer_play(nes_file_path);
+
+            return 0;
+        } else {
+            rt_kprintf("Please enter xxx.nes\n");
+            return -1;
+        }
+    } else {
+        rt_kprintf("Please enter the nes file path\n");
+        return -1;
+    }
+}
+MSH_CMD_EXPORT(nes_start, start nes emulator);
