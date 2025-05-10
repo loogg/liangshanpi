@@ -56,6 +56,9 @@
 
 #define LV_USE_TINY_TTF 1
 
+#define LV_USE_FREETYPE 1
+#define LV_FREETYPE_USE_LVGL_PORT 1
+
 // #define LV_USE_DEMO_WIDGETS 1
 
 // #ifdef PKG_USING_LV_MUSIC_DEMO

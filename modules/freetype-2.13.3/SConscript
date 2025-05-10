@@ -1,0 +1,26 @@
+from building import *
+
+cwd     = GetCurrentDir()
+path = [cwd]
+
+src = Split('''
+src/base/ftmm.c
+src/base/ftbase.c
+src/base/ftbitmap.c
+src/base/ftdebug.c
+src/base/ftglyph.c
+src/base/ftinit.c
+src/base/ftstroke.c
+src/cache/ftcache.c
+src/gzip/ftgzip.c
+src/sfnt/sfnt.c
+src/smooth/smooth.c
+src/truetype/truetype.c
+''')
+
+path += [cwd + '/include']
+
+CPPDEFINES = ['FT2_BUILD_LIBRARY', 'FT_CONFIG_MODULES_H=\'\\"ftmodule.h\\"\'', 'FT_CONFIG_OPTIONS_H=\'\\"ftoption.h\\"\'']
+group = DefineGroup('freetype', src, depend = [''], CPPPATH = path, CPPDEFINES = CPPDEFINES)
+
+Return('group')

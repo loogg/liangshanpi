@@ -11,7 +11,7 @@
 #include <drv_lcd.h>
 
 #define MY_DISP_HOR_RES     LCD_W
-#define DISP_BUFFER_LINES   (LCD_H/2)
+#define DISP_BUFFER_LINES   (LCD_H/5)
 
 /*A static or global variable to store the buffers*/
 static lv_disp_draw_buf_t disp_buf;

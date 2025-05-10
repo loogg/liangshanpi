@@ -9,7 +9,19 @@ LR_IROM1 0x08000000 0x00100000  {    ; load region size_region
    .ANY (+RO)
   }
   RW_IRAM1 0x20000000 0x00070000  {  ; RW data
-   .ANY (+RW +ZI)
+    ftgzip.o (+RO)
+    truetype.o (+RO)
+    ftmm.o (+RO)
+    ftinit.o (+RO)
+    ftstroke.o (+RO)
+    sfnt.o (+RO)
+    ftdebug.o (+RO)
+    ftbase.o (+RO)
+    ftcache.o (+RO)
+    smooth.o (+RO)
+    ftglyph.o (+RO)
+    ftbitmap.o (+RO)
+    .ANY (+RW +ZI)
   }
 }
 

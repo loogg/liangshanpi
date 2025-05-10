@@ -167,6 +167,7 @@
 #define RT_USING_DFS_DEVFS
 #define RT_USING_DFS_ROMFS
 #define RT_USING_DFS_ROMFS_USER_ROOT
+#define RT_USING_DFS_RAMFS
 /* end of DFS: device virtual file system */
 
 /* Device Drivers */
@@ -363,7 +364,7 @@
 
 #define PKG_USING_LVGL
 #define PKG_LVGL_THREAD_PRIO 20
-#define PKG_LVGL_THREAD_STACK_SIZE 16384
+#define PKG_LVGL_THREAD_STACK_SIZE 204800
 #define PKG_LVGL_DISP_REFR_PERIOD 5
 #define PKG_LVGL_USING_V080311
 #define PKG_LVGL_VER_NUM 0x080311
@@ -424,6 +425,14 @@
 /* AT32 HAL & SDK Drivers */
 
 /* end of AT32 HAL & SDK Drivers */
+
+/* HC32 DDL Drivers */
+
+/* end of HC32 DDL Drivers */
+
+/* NXP HAL & SDK Drivers */
+
+/* end of NXP HAL & SDK Drivers */
 /* end of HAL & SDK Drivers */
 
 /* sensors drivers */

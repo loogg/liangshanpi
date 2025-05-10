@@ -6,9 +6,12 @@
 
 
 
+
+
 static const struct romfs_dirent _romfs_root[] = {
     {ROMFS_DIRENT_DIR, "sda", RT_NULL, 0},
-    {ROMFS_DIRENT_DIR, "sdio", RT_NULL, 0}
+    {ROMFS_DIRENT_DIR, "sdio", RT_NULL, 0},
+    {ROMFS_DIRENT_DIR, "tmp", RT_NULL, 0}
 };
 
 const struct romfs_dirent romfs_root = {

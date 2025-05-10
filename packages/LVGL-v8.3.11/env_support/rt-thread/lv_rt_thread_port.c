@@ -38,7 +38,7 @@ rt_align(RT_ALIGN_SIZE)
 #else
 ALIGN(RT_ALIGN_SIZE)
 #endif
-static rt_uint8_t lvgl_thread_stack[PKG_LVGL_THREAD_STACK_SIZE];
+// static rt_uint8_t lvgl_thread_stack[PKG_LVGL_THREAD_STACK_SIZE];
 
 #if LV_USE_LOG
 static void lv_rt_log(const char *buf)
@@ -71,16 +71,25 @@ static void lvgl_thread_entry(void *parameter)
 
 static int lvgl_thread_init(void)
 {
-    rt_err_t err;
+    // rt_err_t err;
 
-    err = rt_thread_init(&lvgl_thread, "LVGL", lvgl_thread_entry, RT_NULL,
-           &lvgl_thread_stack[0], sizeof(lvgl_thread_stack), PKG_LVGL_THREAD_PRIO, 10);
-    if(err != RT_EOK)
+    // err = rt_thread_init(&lvgl_thread, "LVGL", lvgl_thread_entry, RT_NULL,
+    //        &lvgl_thread_stack[0], sizeof(lvgl_thread_stack), PKG_LVGL_THREAD_PRIO, 10);
+    // if(err != RT_EOK)
+    // {
+    //     LOG_E("Failed to create LVGL thread");
+    //     return -1;
+    // }
+    // rt_thread_startup(&lvgl_thread);
+
+    rt_thread_t tid = rt_thread_create("LVGL", lvgl_thread_entry, RT_NULL,
+        PKG_LVGL_THREAD_STACK_SIZE, PKG_LVGL_THREAD_PRIO, 10);
+    if (tid == RT_NULL)
     {
         LOG_E("Failed to create LVGL thread");
         return -1;
     }
-    rt_thread_startup(&lvgl_thread);
+    rt_thread_startup(tid);
 
     return 0;
 }
