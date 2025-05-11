@@ -56,6 +56,7 @@ volatile int keep_running = 0;
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 
 lv_ui guider_ui;
+lv_font_t *lv_ttf_font = NULL;
 
 #if LV_USE_FREEMASTER
 pthread_t thread[2];
@@ -207,8 +208,8 @@ static int tick_thread(void * data)
 
 #if LV_USE_FREEMASTER
 /**
- * Enable simulator to be linked and used as DLL. This function is invoked by 
- * FreeMASTER from its background thread. This function must finish when 
+ * Enable simulator to be linked and used as DLL. This function is invoked by
+ * FreeMASTER from its background thread. This function must finish when
  * sim_exit() is called asynchronously.
  */
 __declspec(dllexport)
@@ -230,7 +231,7 @@ int sim_exit(void)
 
 /**
  * Enable FreeMASTER to configure the simulator before starting it.
- * This function is the first one called by the FreeMASTER from its GUI thread. 
+ * This function is the first one called by the FreeMASTER from its GUI thread.
  */
 __declspec(dllexport)
 int sim_conf(int argc, char *argv[])

@@ -28,15 +28,38 @@
 #if LV_USE_GUIDER_SIMULATOR
 /* code for simulator begin  */
 
+#undef LV_FONT_MONTSERRAT_12
+#undef LV_FONT_MONTSERRAT_14
+#undef LV_FONT_MONTSERRAT_16
+#undef LV_FONT_MONTSERRAT_18
+#undef LV_FONT_MONTSERRAT_20
+#undef LV_FONT_MONTSERRAT_22
+#undef LV_FONT_MONTSERRAT_24
+#undef LV_FONT_MONTSERRAT_26
+#undef LV_FONT_MONTSERRAT_28
+#undef LV_FONT_MONTSERRAT_30
+#undef LV_FONT_MONTSERRAT_32
+
+#define LV_FONT_MONTSERRAT_12 1
+#define LV_FONT_MONTSERRAT_14 1
+#define LV_FONT_MONTSERRAT_16 1
+#define LV_FONT_MONTSERRAT_18 1
+#define LV_FONT_MONTSERRAT_20 1
+#define LV_FONT_MONTSERRAT_22 1
+#define LV_FONT_MONTSERRAT_24 1
+#define LV_FONT_MONTSERRAT_26 1
+#define LV_FONT_MONTSERRAT_28 1
+#define LV_FONT_MONTSERRAT_30 1
+#define LV_FONT_MONTSERRAT_32 1
 
 /* code for simulator end */
 #else
 /* code for board begin */
 
 
-/* code for board end */	
+/* code for board end */
 #endif
 
 
 
-#endif  /* LV_CONF_EXT_H */	
+#endif  /* LV_CONF_EXT_H */

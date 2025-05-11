@@ -145,6 +145,19 @@ menu "Onboard Peripheral Drivers"
         config BSP_USING_LVGL_DEMO
             bool "Enable LVGL demo"
             default y
+
+        if BSP_USING_LVGL_DEMO
+            choice
+                prompt "Select LVGL demo font ttf type"
+                default BSP_LVGL_DEMO_USING_TINYTTF
+
+                config BSP_LVGL_DEMO_USING_TINYTTF
+                    bool "tinyttf"
+
+                config BSP_LVGL_DEMO_USING_FREETYPE
+                    bool "freetype"
+            endchoice
+        endif
     endif
 
 endmenu

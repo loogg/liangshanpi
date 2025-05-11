@@ -11,7 +11,7 @@
 #include <drv_lcd.h>
 
 #define MY_DISP_HOR_RES     LCD_W
-#define DISP_BUFFER_LINES   (LCD_H/5)
+#define DISP_BUFFER_LINES   (LCD_H)
 
 /*A static or global variable to store the buffers*/
 static lv_disp_draw_buf_t disp_buf;
@@ -20,8 +20,8 @@ static lv_disp_draw_buf_t disp_buf;
 static lv_disp_drv_t disp_drv;
 
 /*Static or global buffer(s). The second buffer is optional*/
-static lv_color_t buf_1[MY_DISP_HOR_RES * DISP_BUFFER_LINES];
-static lv_color_t buf_2[MY_DISP_HOR_RES * DISP_BUFFER_LINES];
+// static lv_color_t buf_1[MY_DISP_HOR_RES * DISP_BUFFER_LINES];
+// static lv_color_t buf_2[MY_DISP_HOR_RES * DISP_BUFFER_LINES];
 
 static volatile bool disp_flush_enabled = true;
 uint8_t disp_force_refresh = 0;
@@ -61,6 +61,8 @@ static void disp_flush(lv_disp_drv_t * disp_drv, const lv_area_t * area, lv_colo
 void lv_port_disp_init(void)
 {
     /*Initialize `disp_buf` with the buffer(s). With only one buffer use NULL instead buf_2 */
+    lv_color_t *buf_1 = rt_malloc(MY_DISP_HOR_RES * DISP_BUFFER_LINES * sizeof(lv_color_t));
+    lv_color_t *buf_2 = rt_malloc(MY_DISP_HOR_RES * DISP_BUFFER_LINES * sizeof(lv_color_t));
     lv_disp_draw_buf_init(&disp_buf, buf_1, buf_2, MY_DISP_HOR_RES * DISP_BUFFER_LINES);
 
     lv_disp_drv_init(&disp_drv); /*Basic initialization*/

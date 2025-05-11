@@ -167,7 +167,7 @@
 #define RT_USING_DFS_DEVFS
 #define RT_USING_DFS_ROMFS
 #define RT_USING_DFS_ROMFS_USER_ROOT
-#define RT_USING_DFS_RAMFS
+#define RT_USING_DFS_TMPFS
 /* end of DFS: device virtual file system */
 
 /* Device Drivers */
@@ -364,7 +364,7 @@
 
 #define PKG_USING_LVGL
 #define PKG_LVGL_THREAD_PRIO 20
-#define PKG_LVGL_THREAD_STACK_SIZE 204800
+#define PKG_LVGL_THREAD_STACK_SIZE 30720
 #define PKG_LVGL_DISP_REFR_PERIOD 5
 #define PKG_LVGL_USING_V080311
 #define PKG_LVGL_VER_NUM 0x080311
@@ -537,6 +537,7 @@
 #define BSP_USING_SPI_LCD
 #define BSP_USING_LVGL
 #define BSP_USING_LVGL_DEMO
+#define BSP_LVGL_DEMO_USING_FREETYPE
 /* end of Onboard Peripheral Drivers */
 
 /* On-chip Peripheral Drivers */

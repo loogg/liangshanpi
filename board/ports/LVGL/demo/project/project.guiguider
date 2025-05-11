@@ -326,6 +326,7 @@
 			"visible": true,
 			"flag": [],
 			"list": [],
+			"event": {},
 			"style": [
 				{
 					"part": "LV_PART_MAIN",
@@ -464,6 +465,7 @@
 				"height": 280,
 				"visible": true,
 				"flag": [],
+				"event": {},
 				"style": [
 					{
 						"part": "LV_PART_MAIN",

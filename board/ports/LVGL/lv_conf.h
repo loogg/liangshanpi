@@ -27,7 +27,7 @@
 #define LV_USE_ROLLER     0
 #define LV_USE_SLIDER     0
 #define LV_USE_TABLE      0
-#define LV_USE_ANIMIMG    0
+// #define LV_USE_ANIMIMG    0
 #define LV_USE_CALENDAR   0
 #define LV_USE_CHART      0
 #define LV_USE_COLORWHEEL 0
@@ -45,19 +45,34 @@
 #define LV_USE_WIN        0
 
 #define LV_FONT_MONTSERRAT_14 0
-#define LV_FONT_CUSTOM_DECLARE extern lv_font_t *lv_font_cubic_24;
-#define LV_FONT_DEFAULT lv_font_cubic_24
+#define LV_FONT_CUSTOM_DECLARE        \
+    extern lv_font_t *lv_ttf_font_32; \
+    extern lv_font_t *lv_ttf_font_30; \
+    extern lv_font_t *lv_ttf_font_28; \
+    extern lv_font_t *lv_ttf_font_26; \
+    extern lv_font_t *lv_ttf_font_24; \
+    extern lv_font_t *lv_ttf_font_22; \
+    extern lv_font_t *lv_ttf_font_20; \
+    extern lv_font_t *lv_ttf_font_18; \
+    extern lv_font_t *lv_ttf_font_16; \
+    extern lv_font_t *lv_ttf_font_14; \
+    extern lv_font_t *lv_ttf_font_12; \
+    extern lv_font_t *lv_ttf_font_10; \
+    extern lv_font_t *lv_ttf_font_8;
+
+#define LV_FONT_DEFAULT lv_ttf_font_24
 
 #define LV_USE_FS_STDIO        1
 #define LV_FS_STDIO_LETTER     'S'
 #define LV_FS_STDIO_CACHE_SIZE 4096
 
-#define LV_USE_GIF 1
-
 #define LV_USE_TINY_TTF 1
+#define CONFIG_LV_TINY_TTF_FILE_SUPPORT 1
 
+#ifdef BSP_LVGL_DEMO_USING_FREETYPE
 #define LV_USE_FREETYPE 1
 #define LV_FREETYPE_USE_LVGL_PORT 1
+#endif
 
 // #define LV_USE_DEMO_WIDGETS 1
 

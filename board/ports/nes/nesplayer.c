@@ -573,6 +573,15 @@ static void nesplayer_entry(void* parameter) {
     }
 }
 
+static struct rt_thread nesplayer_thread;
+
+#ifdef rt_align
+rt_align(RT_ALIGN_SIZE)
+#else
+ALIGN(RT_ALIGN_SIZE)
+#endif
+static rt_uint8_t nesplayer_thread_stack[4096];
+
 static int nesplayer_init(void) {
     _lcd_frame_buf1 = rt_malloc(LCD_BUF_SIZE * 3);
     _lcd_frame_buf2 = rt_malloc(LCD_BUF_SIZE * 3);
@@ -589,13 +598,9 @@ static int nesplayer_init(void) {
         return -RT_ERROR;
     }
 
-    rt_thread_t tid = rt_thread_create("nes_p", nesplayer_entry, RT_NULL, 4096, 10, 10);
-    if (tid == RT_NULL) {
-        LOG_E("create nes player thread failed");
-        return -RT_ERROR;
-    }
-    rt_thread_startup(tid);
+    rt_thread_init(&nesplayer_thread, "nesplayer", nesplayer_entry, RT_NULL, &nesplayer_thread_stack[0], sizeof(nesplayer_thread_stack), 10, 10);
+    rt_thread_startup(&nesplayer_thread);
 
     return RT_EOK;
 }
-INIT_COMPONENT_EXPORT(nesplayer_init);
+INIT_APP_EXPORT(nesplayer_init);

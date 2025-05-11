@@ -53,7 +53,9 @@ if GetDepend(['PKG_USING_LVGL']):
                  cwd + '/ports/LVGL/demo/project/generated/guider_customer_fonts',
                  cwd + '/ports/LVGL/demo/project/custom',
                  cwd + '/ports/LVGL/demo/project/custom/customer_setup_screens']
-
+    if GetDepend(['BSP_LVGL_DEMO_USING_FREETYPE']):
+        src += Glob('ports/LVGL/freetype/*.c')
+        path += [cwd + '/ports/LVGL/freetype']
 
 if GetDepend(['BSP_USING_SPI_LCD']):
     src += Glob('ports/lcd/*.c')

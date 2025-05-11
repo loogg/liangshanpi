@@ -14,7 +14,6 @@
 #include <drv_gpio.h>
 #include <rtdevice.h>
 #include <dfs_romfs.h>
-#include <dfs_ramfs.h>
 #include <dfs_fs.h>
 #include <dfs_file.h>
 #include <poll.h>
@@ -40,9 +39,7 @@ int main(void)
 
     dfs_mount(RT_NULL, "/", "rom", 0, &(romfs_root));
 
-    uint8_t *ramfs_pool = rt_malloc(5 * 1024 * 1024);
-
-    dfs_mount(RT_NULL, "/tmp", "ram", 0,  dfs_ramfs_create(ramfs_pool, 5 * 1024 * 1024));
+    dfs_mount(RT_NULL, "/tmp", "tmp", 0, NULL);
 
     stm32_sdcard_mount();
     usb_demo_init();
