@@ -10,11 +10,11 @@ enum {
 };
 
 #define SCREEN_BODY_MAX 50
-#define MUSIC_BTN_ID 14
-#define GAME_BTN_ID 16
+#define MUSIC_BTN_ID 18
+#define GAME_BTN_ID 20
 
 #define PAD_SPACING 10          // 内边距
-#define GRID_SPACING 15          // 网格间距
+#define GRID_SPACING 10          // 网格间距
 #define BODY_LABEL_SIZE 30      // 图标默认尺寸
 #define BODY_IMG_SIZE  40
 
@@ -42,7 +42,13 @@ typedef struct _lv_custom_body {
 static lv_obj_t *main_cont = NULL;
 
 static lv_custom_body_t bodys[SCREEN_BODY_MAX] = {0};
-
+static const char *text_arr[] = {
+    "我",
+    "是",
+    "马",
+    "龙",
+    "伟",
+};
 
 LV_IMG_DECLARE(img_game);
 LV_IMG_DECLARE(img_music);
@@ -149,7 +155,7 @@ static void _scroll_cb(lv_event_t * e) {
         if (bodys[i].type == LV_OBJ_TYPE_IMG) {
             lv_img_set_zoom(bodys[i].obj, (lv_coord_t)(scale_factor * LV_IMG_ZOOM_NONE));
         } else if (bodys[i].type == LV_OBJ_TYPE_LABEL) {
-            lv_coord_t font_size = (lv_coord_t)(16 * scale_factor); // 假设基础字体大小为32
+            lv_coord_t font_size = (lv_coord_t)(20 * scale_factor); // 假设基础字体大小为32
 
             // 根据计算出的大小选择最接近的字体
             const lv_font_t *font = NULL;
@@ -173,8 +179,12 @@ static void _scroll_cb(lv_event_t * e) {
                 font = lv_ttf_font_16;
             } else if (font_size >= 14) {
                 font = lv_ttf_font_14;
-            } else {
+            } else if (font_size >= 12) {
                 font = lv_ttf_font_12;
+            } else if (font_size >= 10) {
+                font = lv_ttf_font_10;
+            } else {
+                font = lv_ttf_font_8;
             }
 
             // 应用字体
@@ -220,8 +230,8 @@ void home_screen_custom_setup(lv_ui *ui) {
 
     // 添加默认样式到每个图标
     for (int i = 0; i < SCREEN_BODY_MAX; i++) {
-        bodys[i].type = LV_OBJ_TYPE_IMG;
-        bodys[i].info.img.src = &img_music;
+        bodys[i].type = LV_OBJ_TYPE_LABEL;
+        bodys[i].info.lbl.text = text_arr[i % LV_CUSTOM_ARRAY_SIZE(text_arr)];
     }
 
     // 特殊图标样式
