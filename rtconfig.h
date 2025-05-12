@@ -538,6 +538,7 @@
 #define BSP_USING_LVGL
 #define BSP_USING_LVGL_DEMO
 #define BSP_LVGL_DEMO_USING_FREETYPE
+#define BSP_NES_FRESH_USING_DOUBLE_BUFFER
 /* end of Onboard Peripheral Drivers */
 
 /* On-chip Peripheral Drivers */

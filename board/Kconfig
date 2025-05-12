@@ -144,18 +144,30 @@ menu "Onboard Peripheral Drivers"
     if BSP_USING_LVGL
         config BSP_USING_LVGL_DEMO
             bool "Enable LVGL demo"
+            select BSP_USING_NES
             default y
 
         if BSP_USING_LVGL_DEMO
             choice
                 prompt "Select LVGL demo font ttf type"
-                default BSP_LVGL_DEMO_USING_TINYTTF
+                default BSP_LVGL_DEMO_USING_FREETYPE
 
                 config BSP_LVGL_DEMO_USING_TINYTTF
                     bool "tinyttf"
 
                 config BSP_LVGL_DEMO_USING_FREETYPE
                     bool "freetype"
+            endchoice
+
+            choice
+                prompt "Select the nes refresh type"
+                default BSP_NES_FRESH_USING_DOUBLE_BUFFER
+
+                config BSP_NES_FRESH_USING_LVGL_IMG
+                    bool "lvgl img"
+
+                config BSP_NES_FRESH_USING_DOUBLE_BUFFER
+                    bool "double buffer"
             endchoice
         endif
     endif

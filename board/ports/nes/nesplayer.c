@@ -46,8 +46,15 @@ typedef struct _nesplayer {
 
 static nesplayer_t _player = {0};
 static uint16_t *_lcd_frame_buf1 = RT_NULL;
+#ifdef BSP_NES_FRESH_USING_DOUBLE_BUFFER
 static uint16_t *_lcd_frame_buf2 = RT_NULL;
+#endif
 static uint16_t *_lcd_framebuffer = RT_NULL;
+
+#ifdef BSP_NES_FRESH_USING_LVGL_IMG
+extern void lv_game_img_draw(void *pcolor);
+extern void lv_game_img_exit(void);
+#endif
 
 #ifdef BSP_USING_NES_C
 /* memory */
@@ -267,11 +274,17 @@ int nes_deinitex(nes_t *nes){
 }
 
 int nes_get_framebuffer(nes_t *nes) {
+#ifdef BSP_NES_FRESH_USING_DOUBLE_BUFFER
     if (_lcd_framebuffer == _lcd_frame_buf1) {
         _lcd_framebuffer = _lcd_frame_buf2;
     } else {
         _lcd_framebuffer = _lcd_frame_buf1;
     }
+#endif
+
+#ifdef BSP_NES_FRESH_USING_LVGL_IMG
+    _lcd_framebuffer = _lcd_frame_buf1;
+#endif
 
     nes->nes_draw_data = _lcd_framebuffer;
 
@@ -279,7 +292,14 @@ int nes_get_framebuffer(nes_t *nes) {
 }
 
 int nes_draw(int x1, int y1, int x2, int y2, nes_color_t* color_data){
-    lcd_fill_array_async(x1, y1 + 10, x2, y2 + 10, _lcd_framebuffer);
+#ifdef BSP_NES_FRESH_USING_DOUBLE_BUFFER
+    lcd_fill_array_async(x1, y1 + 10, x2, y2 + 10, color_data);
+#endif
+
+#ifdef BSP_NES_FRESH_USING_LVGL_IMG
+    lv_game_img_draw(color_data);
+#endif
+
     return 0;
 }
 
@@ -309,11 +329,17 @@ extern uint16_t *lcd_frame_ptr;
 extern uint32_t lcd_frame_write_index;
 
 int nes_get_framebuffer(void) {
+#ifdef BSP_NES_FRESH_USING_DOUBLE_BUFFER
     if (_lcd_framebuffer == _lcd_frame_buf1) {
         _lcd_framebuffer = _lcd_frame_buf2;
     } else {
         _lcd_framebuffer = _lcd_frame_buf1;
     }
+#endif
+
+#ifdef BSP_NES_FRESH_USING_LVGL_IMG
+    _lcd_framebuffer = _lcd_frame_buf1;
+#endif
 
     lcd_frame_ptr = _lcd_framebuffer;
     lcd_frame_write_index = 0;
@@ -322,12 +348,19 @@ int nes_get_framebuffer(void) {
 }
 
 int nes_frame_draw(void) {
+#ifdef BSP_NES_FRESH_USING_DOUBLE_BUFFER
     uint16_t x1 = 0;
     uint16_t y1 = 0;
     uint16_t x2 = 240 - 1;
     uint16_t y2 = 240 - 1;
 
     lcd_fill_array_async(x1, y1 + 10, x2, y2 + 10, _lcd_framebuffer);
+#endif
+
+#ifdef BSP_NES_FRESH_USING_LVGL_IMG
+    lv_game_img_draw(_lcd_framebuffer);
+#endif
+
     return 0;
 }
 
@@ -569,7 +602,13 @@ static void nesplayer_entry(void* parameter) {
 #endif /* BSP_USING_NES_OPENEDV */
 
         _player.state = NESPLAYER_STATE_STOPPED;
+#ifdef BSP_NES_FRESH_USING_DOUBLE_BUFFER
         disp_enable_update();
+#endif
+
+#ifdef BSP_NES_FRESH_USING_LVGL_IMG
+        lv_game_img_exit();
+#endif
     }
 }
 
@@ -584,11 +623,17 @@ static rt_uint8_t nesplayer_thread_stack[4096];
 
 static int nesplayer_init(void) {
     _lcd_frame_buf1 = rt_malloc(LCD_BUF_SIZE);
-    _lcd_frame_buf2 = rt_malloc(LCD_BUF_SIZE);
-    if (_lcd_frame_buf1 == RT_NULL || _lcd_frame_buf2 == RT_NULL) {
+    if (_lcd_frame_buf1 == RT_NULL) {
         LOG_E("malloc lcd frame buffer failed");
         return -RT_ERROR;
     }
+#ifdef BSP_NES_FRESH_USING_DOUBLE_BUFFER
+    _lcd_frame_buf2 = rt_malloc(LCD_BUF_SIZE);
+    if (_lcd_frame_buf2 == RT_NULL) {
+        LOG_E("malloc lcd frame buffer failed");
+        return -RT_ERROR;
+    }
+#endif
     _lcd_framebuffer = _lcd_frame_buf1;
 
     _player.key_mb = rt_mb_create("nes_kb", 32, RT_IPC_FLAG_FIFO);
