@@ -78,12 +78,19 @@ void lv_user_gui_init(void)
     }
     close(fd);
 
-    lv_ttf_font = lv_tiny_ttf_create_data_ex(buf, s.st_size, 24, 16*1024);
-    if (lv_ttf_font == NULL) {
-        LOG_E("Failed to create font from TTF data");
-        rt_free(buf);
-        return;
-    }
+    lv_ttf_font_32 = lv_tiny_ttf_create_data_ex(buf, s.st_size, 32, 32*1024);
+    lv_ttf_font_30 = lv_tiny_ttf_create_data_ex(buf, s.st_size, 30, 32*1024);
+    lv_ttf_font_28 = lv_tiny_ttf_create_data_ex(buf, s.st_size, 28, 32*1024);
+    lv_ttf_font_26 = lv_tiny_ttf_create_data_ex(buf, s.st_size, 26, 32*1024);
+    lv_ttf_font_24 = lv_tiny_ttf_create_data_ex(buf, s.st_size, 24, 32*1024);
+    lv_ttf_font_22 = lv_tiny_ttf_create_data_ex(buf, s.st_size, 22, 32*1024);
+    lv_ttf_font_20 = lv_tiny_ttf_create_data_ex(buf, s.st_size, 20, 32*1024);
+    lv_ttf_font_18 = lv_tiny_ttf_create_data_ex(buf, s.st_size, 18, 32*1024);
+    lv_ttf_font_16 = lv_tiny_ttf_create_data_ex(buf, s.st_size, 16, 32*1024);
+    lv_ttf_font_14 = lv_tiny_ttf_create_data_ex(buf, s.st_size, 14, 32*1024);
+    lv_ttf_font_12 = lv_tiny_ttf_create_data_ex(buf, s.st_size, 12, 32*1024);
+    lv_ttf_font_10 = lv_tiny_ttf_create_data_ex(buf, s.st_size, 10, 32*1024);
+    lv_ttf_font_8 = lv_tiny_ttf_create_data_ex(buf, s.st_size, 8, 32*1024);
 #endif
 
 #ifdef BSP_LVGL_DEMO_USING_FREETYPE

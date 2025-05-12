@@ -583,8 +583,8 @@ ALIGN(RT_ALIGN_SIZE)
 static rt_uint8_t nesplayer_thread_stack[4096];
 
 static int nesplayer_init(void) {
-    _lcd_frame_buf1 = rt_malloc(LCD_BUF_SIZE * 3);
-    _lcd_frame_buf2 = rt_malloc(LCD_BUF_SIZE * 3);
+    _lcd_frame_buf1 = rt_malloc(LCD_BUF_SIZE);
+    _lcd_frame_buf2 = rt_malloc(LCD_BUF_SIZE);
     if (_lcd_frame_buf1 == RT_NULL || _lcd_frame_buf2 == RT_NULL) {
         LOG_E("malloc lcd frame buffer failed");
         return -RT_ERROR;
