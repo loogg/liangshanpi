@@ -1,3 +1,5 @@
+import os
+import rtconfig
 from building import *
 
 cwd     = GetCurrentDir()
@@ -20,7 +22,13 @@ src/truetype/truetype.c
 
 path += [cwd + '/include']
 
-CPPDEFINES = ['FT2_BUILD_LIBRARY', 'FT_CONFIG_MODULES_H=\'\\"ftmodule.h\\"\'', 'FT_CONFIG_OPTIONS_H=\'\\"ftoption.h\\"\'']
+CPPDEFINES = []
+
+if rtconfig.PLATFORM in ['armcc', 'armclang']:
+    CPPDEFINES += ['FT2_BUILD_LIBRARY', 'FT_CONFIG_MODULES_H=\'\\"ftmodule.h\\"\'', 'FT_CONFIG_OPTIONS_H=\'\\"ftoption.h\\"\'']
+else:
+    CPPDEFINES += ['FT2_BUILD_LIBRARY', 'FT_CONFIG_MODULES_H=\\\"ftmodule.h\\\"', 'FT_CONFIG_OPTIONS_H=\\\"ftoption.h\\\"']
+
 group = DefineGroup('freetype', src, depend = ['BSP_LVGL_DEMO_USING_FREETYPE'], CPPPATH = path, CPPDEFINES = CPPDEFINES)
 
 Return('group')
