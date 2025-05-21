@@ -39,3 +39,5 @@ RTE/
 settings/
 *.uvguix*
 cconfig.h
+.cache
+!uvConvertor-CLI.exe
