@@ -11,6 +11,7 @@
 #include <lvgl.h>
 #include "gui_guider.h"
 #include "custom.h"
+#include "lv_tiny_ttf.h"
 #include <dfs_file.h>
 #include <poll.h>
 #include <unistd.h>
@@ -52,51 +53,26 @@ void lv_user_gui_init(void)
         rt_thread_mdelay(200);
     }
 
-#ifdef BSP_LVGL_DEMO_USING_TINYTTF
-    struct stat s;
-    if (stat(SD_TTF_PATH, &s) != 0) {
-        LOG_E("TTF file not found");
-        return;
-    }
-
-    uint8_t *buf = rt_malloc(s.st_size);
-    if (buf == NULL) {
-        LOG_E("Failed to allocate memory for TTF file");
-        return;
-    }
-    int fd = open(SD_TTF_PATH, O_RDONLY);
-    if (fd < 0) {
-        LOG_E("Failed to open TTF file");
-        rt_free(buf);
-        return;
-    }
-    if (read(fd, buf, s.st_size) != s.st_size) {
-        LOG_E("Failed to read TTF file");
-        close(fd);
-        rt_free(buf);
-        return;
-    }
-    close(fd);
-
-    lv_ttf_font_32 = lv_tiny_ttf_create_data_ex(buf, s.st_size, 32, 32*1024);
-    lv_ttf_font_30 = lv_tiny_ttf_create_data_ex(buf, s.st_size, 30, 32*1024);
-    lv_ttf_font_28 = lv_tiny_ttf_create_data_ex(buf, s.st_size, 28, 32*1024);
-    lv_ttf_font_26 = lv_tiny_ttf_create_data_ex(buf, s.st_size, 26, 32*1024);
-    lv_ttf_font_24 = lv_tiny_ttf_create_data_ex(buf, s.st_size, 24, 32*1024);
-    lv_ttf_font_22 = lv_tiny_ttf_create_data_ex(buf, s.st_size, 22, 32*1024);
-    lv_ttf_font_20 = lv_tiny_ttf_create_data_ex(buf, s.st_size, 20, 32*1024);
-    lv_ttf_font_18 = lv_tiny_ttf_create_data_ex(buf, s.st_size, 18, 32*1024);
-    lv_ttf_font_16 = lv_tiny_ttf_create_data_ex(buf, s.st_size, 16, 32*1024);
-    lv_ttf_font_14 = lv_tiny_ttf_create_data_ex(buf, s.st_size, 14, 32*1024);
-    lv_ttf_font_12 = lv_tiny_ttf_create_data_ex(buf, s.st_size, 12, 32*1024);
-    lv_ttf_font_10 = lv_tiny_ttf_create_data_ex(buf, s.st_size, 10, 32*1024);
-    lv_ttf_font_8 = lv_tiny_ttf_create_data_ex(buf, s.st_size, 8, 32*1024);
-#endif
-
-#ifdef BSP_LVGL_DEMO_USING_FREETYPE
     void copy(const char *src, const char *dst);
     copy(SD_TTF_PATH, TMP_TTF_PATH);
 
+#ifdef BSP_LVGL_DEMO_USING_TINYTTF
+    lv_ttf_font_32 = lv_tiny_ttf_create_file_ex(FREETYPE_TTF_PATH, 32, 32*1024);
+    lv_ttf_font_30 = lv_tiny_ttf_create_file_ex(FREETYPE_TTF_PATH, 30, 32*1024);
+    lv_ttf_font_28 = lv_tiny_ttf_create_file_ex(FREETYPE_TTF_PATH, 28, 32*1024);
+    lv_ttf_font_26 = lv_tiny_ttf_create_file_ex(FREETYPE_TTF_PATH, 26, 32*1024);
+    lv_ttf_font_24 = lv_tiny_ttf_create_file_ex(FREETYPE_TTF_PATH, 24, 32*1024);
+    lv_ttf_font_22 = lv_tiny_ttf_create_file_ex(FREETYPE_TTF_PATH, 22, 32*1024);
+    lv_ttf_font_20 = lv_tiny_ttf_create_file_ex(FREETYPE_TTF_PATH, 20, 32*1024);
+    lv_ttf_font_18 = lv_tiny_ttf_create_file_ex(FREETYPE_TTF_PATH, 18, 32*1024);
+    lv_ttf_font_16 = lv_tiny_ttf_create_file_ex(FREETYPE_TTF_PATH, 16, 32*1024);
+    lv_ttf_font_14 = lv_tiny_ttf_create_file_ex(FREETYPE_TTF_PATH, 14, 32*1024);
+    lv_ttf_font_12 = lv_tiny_ttf_create_file_ex(FREETYPE_TTF_PATH, 12, 32*1024);
+    lv_ttf_font_10 = lv_tiny_ttf_create_file_ex(FREETYPE_TTF_PATH, 10, 32*1024);
+    lv_ttf_font_8 = lv_tiny_ttf_create_file_ex(FREETYPE_TTF_PATH, 8, 32*1024);
+#endif
+
+#ifdef BSP_LVGL_DEMO_USING_FREETYPE
     /*FreeType uses C standard file system, so no driver letter is required.*/
     ft_info.name = FREETYPE_TTF_PATH;
     ft_info.weight = 32;
